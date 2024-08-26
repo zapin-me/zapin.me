@@ -1,0 +1,5 @@
+phoenix.conf
+phoenix.log
+phoenix.mainnet.*
+phoenix.testnet.*
+seed.dat

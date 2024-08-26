@@ -1,0 +1,49 @@
+version: "3"
+
+services:
+  phoenixd:
+    build:
+      context: ./submodules/phoenixd
+      dockerfile: .docker/Dockerfile
+    ports:
+      - 9741:9740
+    volumes:
+      - ./2_phoenixd:/phoenix/.phoenix
+    restart: always
+    networks:
+      - zapin-network
+
+  backend:
+    build:
+      context: ./0_backend
+      dockerfile: ./Dockerfile
+    ports:
+      - 4270:4270
+    env_file:
+      - ./0_backend/.env
+    volumes:
+      - ./0_backend:/usr/src/app
+      - ./0_backend/data:/usr/src/app/data
+    restart: always
+    depends_on:
+      - phoenixd
+    networks:
+      - zapin-network
+
+  frontend:
+    build:
+      context: ./1_frontend
+      dockerfile: ./Dockerfile
+    ports:
+      - 3006:3000
+    volumes:
+      - ./1_frontend:/usr/src/app
+    restart: always
+    depends_on:
+      - backend
+    networks:
+      - zapin-network
+
+networks:
+  zapin-network:
+    driver: bridge
