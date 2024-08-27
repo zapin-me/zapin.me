@@ -25,9 +25,9 @@ const Header = ({
 }) => {
   return (
     <div className="flex items-center px-8 py-2 w-full bg-indigo-700 shadow-2xl h-[56px]">
-      <a href="/" className="flex items-center">
+      <Link href="/" className="flex items-center">
         <h1 className="text-3xl font-bold text-white">zapin.me</h1>
-      </a>
+      </Link>
       <span className="text-pink-100 text-[10px] mt-3 ml-1">v{version}</span>
       <div className="flex-1" />
       <div className="flex items-center text-white space-x-6 gap-1">

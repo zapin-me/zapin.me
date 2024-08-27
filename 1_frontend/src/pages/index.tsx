@@ -21,7 +21,8 @@ const NEXT_PUBLIC_LIMIT_MESSAGES = process.env.NEXT_PUBLIC_LIMIT_MESSAGES || 5;
 
 export default function Home() {
   const [socketId, setSocketId] = useState<string | null>(null);
-  const [listInvoices, setListInvoices] = useState<any[]>([]);
+  const [marketList, setMarkerList] = useState<any[]>([]);
+  const [marketListDeactivated, setMarkerListDeactivated] = useState<any[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [page, setPage] = useState(1);
   const [stage, setStage] = useState(0);
@@ -53,13 +54,24 @@ export default function Home() {
       },
     });
 
-    // setDisableLoadMore(false);
+    setMarkerList((prevInvoices) => [
+      ...prevInvoices,
+      ...response.data.invoices,
+    ]);
+  };
 
-    // if (response.data.invoices.length < NEXT_PUBLIC_LIMIT_MESSAGES) {
-    //   setDisableLoadMore(true);
-    // }
+  const fetchInvoicesDeactivated = async (page: number) => {
+    const response = await axios.get(
+      `${NEXT_PUBLIC_BACKEND_URL}/invoices/deactivated`,
+      {
+        params: {
+          page: page,
+          limit: NEXT_PUBLIC_LIMIT_MESSAGES,
+        },
+      }
+    );
 
-    setListInvoices((prevInvoices) => [
+    setMarkerListDeactivated((prevInvoices) => [
       ...prevInvoices,
       ...response.data.invoices,
     ]);
@@ -69,6 +81,7 @@ export default function Home() {
     if (!socketId) return;
 
     fetchInvoices(page);
+    fetchInvoicesDeactivated(page);
     fetchTotalPins();
   }, [socketId, page]);
 
@@ -76,7 +89,7 @@ export default function Home() {
     setTimeout(() => {
       fetchTotalPins();
     }, 1000);
-  }, [listInvoices]);
+  }, [marketList]);
 
   useEffect(() => {
     const socket = io(`${NEXT_PUBLIC_BACKEND_URL}`);
@@ -101,7 +114,7 @@ export default function Home() {
     socket.on("new-message", (message) => {
       const messageParsed = JSON.parse(message);
 
-      setListInvoices((prevInvoices) => [messageParsed, ...prevInvoices]);
+      setMarkerList((prevInvoices) => [messageParsed, ...prevInvoices]);
       setRunConfetti(true);
       fetchTotalPins();
 
@@ -152,9 +165,10 @@ export default function Home() {
         activePins={totalPinsActive}
       />
       <MapComponent
-        markers={listInvoices}
+        markers={marketList}
+        marketListDeactivated={marketListDeactivated}
         fetchTotalPins={fetchTotalPins}
-        setMarkers={setListInvoices}
+        setMarkers={setMarkerList}
       />
       {runConfetti && <ConfettiExplosion />}
       <PopUpModal

@@ -41,34 +41,35 @@ export default function Home() {
             a message on a global map for all to see, while also supporting
             open-source development.
           </p>
-
           <h2 className="text-2xl font-bold text-pink-200 mb-4 pt-10">
             How It Works
           </h2>
           <p className="text-lg">
             On <span className="font-bold">zapin.me</span>, each message you pin
-            is fueled by Satoshis. For every Satoshi you donate, your message
-            stays visible on the map for{" "}
-            <span className="font-bold text-yellow-300">
-              10 seconds per Satoshi
-            </span>
-            . This means that you have full control over how long your message
+            is fueled by Satoshis.
+          </p>
+          <div className="text-lg font-bold text-yellow-300 my-4">
+            1 minute = 1 Satoshi
+          </div>
+          <p className="text-lg">
+            This means that you have full control over how long your message
             remains on the map. For example:
           </p>
           <ul className="list-disc list-inside text-lg ml-4">
             <li>
               <span className="font-bold text-yellow-300">1 Satoshi</span> keeps
-              your message visible for 10 seconds.
+              your message visible for 1 minute.
             </li>
             <li>
               <span className="font-bold text-yellow-300">360 Satoshis</span>{" "}
-              keeps your message visible for 1 hour.
+              keeps your message visible for 6 hours.
             </li>
             <li>
               <span className="font-bold text-yellow-300">3600 Satoshis</span>{" "}
-              keeps your message visible for 10 hours.
+              keeps your message visible for 60 hours.
             </li>
           </ul>
+
           <p className="text-lg">
             It&apos;s a fun and interactive way to engage with the community and
             maybe even earn a few Satoshis along the way!

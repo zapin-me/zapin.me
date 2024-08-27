@@ -10,6 +10,13 @@ interface TimeLeft {
   seconds: number;
 }
 
+const deactivatedIcon = icon({
+  iconUrl: "./map-pin-check-inside-deactivated.svg",
+  iconSize: [30, 30],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+});
+
 const customIcon = icon({
   iconUrl: "./map-pin-check-inside.svg",
   iconSize: [40, 40],
@@ -124,6 +131,7 @@ const Map = ({
   markers,
   setMarkers,
   fetchTotalPins,
+  marketListDeactivated,
 }: {
   markers: {
     amount: number;
@@ -134,6 +142,7 @@ const Map = ({
   }[];
   fetchTotalPins: () => void;
   setMarkers: any;
+  marketListDeactivated: any;
 }) => {
   const handleRemoveMarker = async (index: number) => {
     setMarkers((prevMarkers: any[]) =>
@@ -163,6 +172,35 @@ const Map = ({
           attribution=""
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+        {marketListDeactivated.map((marker: any, index: number) => {
+          const lat = parseFloat(marker.lat_long.split(",")[0]);
+          const long = parseFloat(marker.lat_long.split(",")[1]);
+
+          return (
+            <Marker key={index} position={[lat, long]} icon={deactivatedIcon}>
+              <Popup>
+                <div className="relative px-6 py-1 bg-gray-800 text-white rounded-lg shadow-md w-full min-w-[250px]">
+                  <div className="flex items-center mb-0">
+                    <Zap className="w-4 h-4 text-yellow-500 mr-1" />
+                    <p className="text-sm text-yellow-500 font-semibold">
+                      {marker.amount}
+                    </p>
+                  </div>
+
+                  <h2 className="text-[18px] font-medium text-white mb-0">
+                    {marker.message}
+                  </h2>
+
+                  <p className="text-xs text-gray-300 text-right">
+                    Deactivated
+                  </p>
+
+                  <div className="absolute bottom-[-7px] left-1/2 transform -translate-x-1/2 w-0 h-0 border-t-8 border-t-gray-800 border-x-8 border-x-transparent"></div>
+                </div>
+              </Popup>
+            </Marker>
+          );
+        })}
         {markers.map((marker, index) => {
           const lat = parseFloat(marker.lat_long.split(",")[0]);
           const long = parseFloat(marker.lat_long.split(",")[1]);

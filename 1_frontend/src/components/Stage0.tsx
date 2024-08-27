@@ -1,9 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import axios from "axios";
-import { Eraser, Send } from "lucide-react";
+import { Eraser, File, Send, Smile } from "lucide-react";
 import { useState, useEffect } from "react";
 import { z } from "zod";
 import { CreatePinMap } from "./MapComponent";
+import EmojiPicker from "emoji-picker-react";
 
 const NEXT_PUBLIC_BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -50,6 +51,7 @@ const Stage0 = ({
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [loopNum, setLoopNum] = useState<number>(0);
   const [typingSpeed, setTypingSpeed] = useState<number>(150);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   const placeholders = [
     "What's your pin-worthy message?",
@@ -88,7 +90,7 @@ const Stage0 = ({
   }, [placeholder, isDeleting, typingSpeed, loopNum]);
 
   const calculateActiveTime = (sats: number) => {
-    const totalSeconds = sats * 10;
+    const totalSeconds = sats * 60;
 
     const years = Math.floor(totalSeconds / (365 * 24 * 3600));
     const months = Math.floor(
@@ -149,21 +151,52 @@ const Stage0 = ({
     }
   };
 
+  const onEmojiClick = (emojiObject: { emoji: string }) => {
+    setMessage(message + emojiObject.emoji);
+    setShowEmojiPicker(false);
+  };
+
   return (
     <div className="flex flex-col space-y-2 w-full max-w-[700px] rounded-lg">
       <h2 className="text-2xl font-bold text-white mb-2">
         Drop a pin and leave your mark!
       </h2>
 
-      <div className="space-y-2">
+      <div className="">
         <textarea
           placeholder={placeholder}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           className="w-full text-gray-900 px-4 py-3 rounded-md bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 transition duration-200 h-32 resize-none"
         />
+
+        <button
+          type="button"
+          onClick={() => {
+            setShowEmojiPicker(!showEmojiPicker);
+          }}
+          className="absolute bg-pink-400 rounded-full p-2 text-white mt-[8.5vh] -ml-[45px] hover:text-white hover:bg-pink-500"
+        >
+          <Smile size={20} />
+        </button>
+
+        {/* <button
+          type="button"
+          onClick={() => {
+            setShowEmojiPicker(!showEmojiPicker);
+          }}
+          className="ml-2 relative bg-purple-400 rounded-full p-2 text-white mt-2 mb-2 hover:text-gray-600"
+        >
+          <File size={20} />
+        </button> */}
+
         {errors.message && (
           <p className="text-pink-500 text-sm">{errors.message}</p>
+        )}
+        {showEmojiPicker && (
+          <div className="absolute z-10 ml-[250px]">
+            <EmojiPicker onEmojiClick={onEmojiClick} />
+          </div>
         )}
       </div>
 

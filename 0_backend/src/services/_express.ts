@@ -9,6 +9,7 @@ import {
   countInvoices,
   createInvoice,
   getAllInvoices,
+  getAllInvoicesDeactivated,
   getInvoiceByInvoice,
   updateInvoiceStatus,
 } from "./_db";
@@ -51,10 +52,10 @@ const initExpress = async ({ phoenix, db }: Props) => {
           return;
         }
 
-        // (timestamp) deactivate_at = current date + amount * 10 seconds
+        // (timestamp) deactivate_at = current date + amount * 60 seconds
         const deactivate_at = new Date();
         deactivate_at.setSeconds(
-          deactivate_at.getSeconds() + invoiceUpdated?.amount * 10
+          deactivate_at.getSeconds() + invoiceUpdated?.amount * 60
         );
         const timestamp = Math.floor(deactivate_at.getTime() / 1000);
 
@@ -170,13 +171,35 @@ const initExpress = async ({ phoenix, db }: Props) => {
       }
     });
 
+    app.get("/invoices/deactivated", async (req, res) => {
+      try {
+        const { page = 1, limit = 10 } = req.query;
+
+        const pageNumber = parseInt(page as string, 10);
+        const limitNumber = parseInt(limit as string, 10);
+
+        const offset = (pageNumber - 1) * limitNumber;
+
+        const invoices = await getAllInvoicesDeactivated(
+          db,
+          limitNumber,
+          offset
+        );
+
+        return res.json({ invoices });
+      } catch (error: any) {
+        console.log(error);
+        res.status(500).json({ error: error.message });
+      }
+    });
+
     app.post("/new-invoice", async (req, res) => {
       try {
         const { message, amount, websocket_id, lat_long } = req.body;
 
-        // (timestamp) deactivate_at = current date + amount * 10 seconds
+        // (timestamp) deactivate_at = current date + amount * 60 seconds
         const deactivate_at = new Date();
-        deactivate_at.setSeconds(deactivate_at.getSeconds() + amount * 10);
+        deactivate_at.setSeconds(deactivate_at.getSeconds() + amount * 60);
         const timestamp = Math.floor(deactivate_at.getTime() / 1000);
 
         if (!message || !amount || !websocket_id) {

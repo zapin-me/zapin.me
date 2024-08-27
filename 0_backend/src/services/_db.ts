@@ -154,6 +154,39 @@ async function countInvoices(db: any) {
   }
 }
 
+async function getAllInvoicesDeactivated(
+  db: any,
+  limit: number,
+  offset: number
+) {
+  if (!db) return null;
+
+  try {
+    return await db.all(
+      `
+      SELECT 
+        message,
+        amount,
+        lat_long,
+        deactivate_at,
+        updated_at
+      FROM invoices 
+      WHERE 
+        message IS NOT NULL
+        AND status = 'paid'
+        AND deactivate_at <= strftime('%s', 'now')
+      ORDER BY deactivate_at DESC
+      LIMIT ?
+      OFFSET ?
+      `,
+      [limit, offset]
+    );
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
+
 async function getAllInvoices(db: any, limit: number, offset: number) {
   if (!db) return null;
 
@@ -235,5 +268,6 @@ export {
   checkInvoiceExists,
   getAllInvoices,
   getInvoiceByInvoice,
+  getAllInvoicesDeactivated,
   countInvoices,
 };
