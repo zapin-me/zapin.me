@@ -27,7 +27,6 @@ export default function Home() {
   const [page, setPage] = useState(1);
   const [stage, setStage] = useState(0);
   const [invoice, setInvoice] = useState<string | null>(null);
-  // const [disableLoadMore, setDisableLoadMore] = useState(true);
   const [runConfetti, setRunConfetti] = useState(false);
   const [message, setMessage] = useState("");
   const [amount, setAmount] = useState(360);
@@ -158,7 +157,7 @@ export default function Home() {
       className={`flex flex-col bg-gray-900 text-white ${inter.className} h-screen`}
     >
       <Header
-        version="0.0.1"
+        version="0.1.0"
         setShowModal={setShowModal}
         usersConnected={usersConnected}
         totalPins={totalPins}

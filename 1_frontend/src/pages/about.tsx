@@ -12,7 +12,7 @@ export default function Home() {
         className={`flex flex-col bg-indigo-900 text-white ${inter.className} h-full`}
       >
         <HeaderSimple aboutLink="/about" githubLink="" version="0.0.1" />
-        <div className="flex flex-col w-full max-w-[600px] ml-auto mr-auto pt-12 space-y-6 pb-24">
+        <div className="flex flex-col w-full max-w-[600px] pl-6 pr-6 ml-auto mr-auto pt-12 space-y-6 pb-24">
           <h1 className="text-4xl font-bold text-white mb-4">
             About zapin.me...
           </h1>

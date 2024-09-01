@@ -52,7 +52,7 @@ const CreatePinMap = ({
       style={{
         borderRadius: "6px",
         overflow: "hidden",
-        height: "400px",
+        height: "275px",
         width: "100%",
         zIndex: 0,
       }}

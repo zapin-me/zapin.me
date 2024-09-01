@@ -159,7 +159,7 @@ const Stage0 = ({
   return (
     <div className="flex flex-col space-y-2 w-full max-w-[700px] rounded-lg">
       <h2 className="text-2xl font-bold text-white mb-2">
-        Drop a pin and leave your mark!
+        Drop a pin on the map!
       </h2>
 
       <div className="">
@@ -180,19 +180,10 @@ const Stage0 = ({
           <Smile size={20} />
         </button>
 
-        {/* <button
-          type="button"
-          onClick={() => {
-            setShowEmojiPicker(!showEmojiPicker);
-          }}
-          className="ml-2 relative bg-purple-400 rounded-full p-2 text-white mt-2 mb-2 hover:text-gray-600"
-        >
-          <File size={20} />
-        </button> */}
-
         {errors.message && (
           <p className="text-pink-500 text-sm">{errors.message}</p>
         )}
+
         {showEmojiPicker && (
           <div className="absolute z-10 ml-[250px]">
             <EmojiPicker onEmojiClick={onEmojiClick} />
@@ -213,9 +204,11 @@ const Stage0 = ({
             sats
           </span>
         </div>
+
         {errors.amount && (
           <p className="text-pink-500 text-sm">{errors.amount}</p>
         )}
+
         <p className="text-indigo-200 text-sm">
           Marker will be active for:{" "}
           <span className="text-white font-bold">
@@ -231,7 +224,7 @@ const Stage0 = ({
         setMarker={setMarker}
       />
 
-      <div className="flex space-x-2">
+      <div className="flex space-x-2 flex-col md:flex-row gap-4">
         <button
           className="w-full text-gray-300 px-4 py-2 rounded-full hover:text-white transition duration-200 ease-in-out flex items-center justify-center space-x-2 transform"
           onClick={() => setShowModal(false)}

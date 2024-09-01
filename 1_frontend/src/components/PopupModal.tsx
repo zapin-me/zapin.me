@@ -28,12 +28,12 @@ const PopUpModal = ({
   if (!showModal) return null;
   return (
     <div
-      className="fixed inset-0 bg-indigo-700 bg-opacity-80 flex items-center justify-center w-full m-auto"
+      className="fixed inset-0 bg-indigo-700 bg-opacity-80 flex items-center justify-center w-full m-auto overflow-y-auto"
       onMouseDown={handleClickOutside}
     >
       <div
         ref={modalRef}
-        className="bg-indigo-800 p-6 rounded-lg shadow-lg max-w-[720px]"
+        className="bg-indigo-800 p-6 rounded-lg shadow-lg max-w-[720px] max-h-[90vh] overflow-y-auto"
       >
         {children}
       </div>
