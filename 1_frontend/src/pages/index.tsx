@@ -152,6 +152,12 @@ export default function Home() {
     initWebLN();
   }, [invoice]);
 
+  const onRightClick = (lat: number, long: number) => {
+    setCenter({ lat: lat, lng: long });
+    setMarker({ lat: lat, lng: long });
+    setShowModal(true);
+  };
+
   return (
     <main
       className={`flex flex-col bg-gray-900 text-white ${inter.className} h-screen`}
@@ -164,6 +170,7 @@ export default function Home() {
         activePins={totalPinsActive}
       />
       <MapComponent
+        onRightClick={onRightClick}
         markers={marketList}
         marketListDeactivated={marketListDeactivated}
         fetchTotalPins={fetchTotalPins}

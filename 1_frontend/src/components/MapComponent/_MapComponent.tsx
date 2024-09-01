@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { MapContainer, Marker, TileLayer, Popup } from "react-leaflet";
+import {
+  MapContainer,
+  Marker,
+  TileLayer,
+  Popup,
+  useMapEvents,
+} from "react-leaflet";
 import { Zap } from "lucide-react";
 import { icon } from "leaflet";
 
@@ -132,6 +138,7 @@ const Map = ({
   setMarkers,
   fetchTotalPins,
   marketListDeactivated,
+  onRightClick,
 }: {
   markers: {
     amount: number;
@@ -143,12 +150,26 @@ const Map = ({
   fetchTotalPins: () => void;
   setMarkers: any;
   marketListDeactivated: any;
+  onRightClick: (lat: number, long: number) => void;
 }) => {
   const handleRemoveMarker = async (index: number) => {
     setMarkers((prevMarkers: any[]) =>
       prevMarkers.filter((_: any, i: number) => i !== index)
     );
     fetchTotalPins();
+  };
+
+  const MapEventsHandler = ({
+    onRightClick,
+  }: {
+    onRightClick: (lat: number, lng: number) => void;
+  }) => {
+    useMapEvents({
+      contextmenu(e) {
+        onRightClick(e.latlng.lat, e.latlng.lng);
+      },
+    });
+    return null;
   };
 
   return (
@@ -172,6 +193,7 @@ const Map = ({
           attribution=""
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+        <MapEventsHandler onRightClick={onRightClick} />
         {marketListDeactivated.map((marker: any, index: number) => {
           const lat = parseFloat(marker.lat_long.split(",")[0]);
           const long = parseFloat(marker.lat_long.split(",")[1]);
