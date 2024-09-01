@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import {
   MapContainer,
   Marker,
@@ -6,15 +6,10 @@ import {
   Popup,
   useMapEvents,
 } from "react-leaflet";
-import { Zap } from "lucide-react";
+import { Link, Zap } from "lucide-react";
 import { icon } from "leaflet";
-
-interface TimeLeft {
-  days: number;
-  hours: number;
-  minutes: number;
-  seconds: number;
-}
+import { formatTimeLeft } from "@/Utils/formatTimeLeft";
+import { useCountdown } from "@/Utils/useCountdown";
 
 const deactivatedIcon = icon({
   iconUrl: "./map-pin-check-inside-deactivated.svg",
@@ -30,73 +25,6 @@ const customIcon = icon({
   popupAnchor: [1, -34],
 });
 
-const calculateTimeLeft = (timestamp: string): TimeLeft => {
-  const now = new Date().getTime();
-  const deactivateTime = parseInt(timestamp) * 1000;
-  const difference = deactivateTime - now;
-
-  let timeLeft = {} as TimeLeft;
-
-  if (difference > 0) {
-    timeLeft = {
-      days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-      hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-      minutes: Math.floor((difference / 1000 / 60) % 60),
-      seconds: Math.floor((difference / 1000) % 60),
-    };
-  } else {
-    timeLeft = {
-      days: 0,
-      hours: 0,
-      minutes: 0,
-      seconds: 0,
-    };
-  }
-
-  return timeLeft;
-};
-
-const useCountdown = (timestamp: string, onComplete: () => void) => {
-  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft(timestamp));
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const newTimeLeft = calculateTimeLeft(timestamp);
-      setTimeLeft(newTimeLeft);
-
-      if (
-        newTimeLeft.days === 0 &&
-        newTimeLeft.hours === 0 &&
-        newTimeLeft.minutes === 0 &&
-        newTimeLeft.seconds === 0
-      ) {
-        onComplete();
-      }
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, [timestamp, timeLeft, onComplete]);
-
-  return timeLeft;
-};
-
-const formatTimeLeft = (timeLeft: any) => {
-  let formattedTime = "";
-
-  if (timeLeft.days > 0) {
-    formattedTime += `${timeLeft.days}d `;
-  }
-  if (timeLeft.hours > 0 || timeLeft.days > 0) {
-    formattedTime += `${timeLeft.hours}h `;
-  }
-  if (timeLeft.minutes > 0 || timeLeft.hours > 0 || timeLeft.days > 0) {
-    formattedTime += `${timeLeft.minutes}m `;
-  }
-  formattedTime += `${timeLeft.seconds}s`;
-
-  return formattedTime.trim();
-};
-
 const MarkerPopup = ({
   marker,
   onRemove,
@@ -105,15 +33,31 @@ const MarkerPopup = ({
   onRemove: () => void;
 }) => {
   const timeLeft = useCountdown(marker.deactivate_at, onRemove);
+  const [copied, setCopied] = React.useState(false);
 
   return (
     <Popup>
       <div className="relative px-6 py-1 bg-indigo-800 text-white rounded-lg shadow-md w-full min-w-[250px]">
-        <div className="flex items-center mb-0">
-          <Zap className="w-4 h-4 text-yellow-500 mr-1" />
-          <p className="text-sm text-yellow-500 font-semibold">
-            {marker.amount}
-          </p>
+        <div className="flex items-center justify-between mb-0">
+          <div className="flex items-center">
+            <Zap className="w-4 h-4 text-yellow-500 mr-1" />
+            <p className="text-sm text-yellow-500 font-semibold">
+              {marker.amount}
+            </p>
+          </div>
+          <div className="relative group">
+            <Link
+              className="w-4 h-4 text-white cursor-pointer"
+              onClick={() => {
+                const url = `https://zapin.me/?pin=${marker.id}`;
+                navigator.clipboard.writeText(url);
+                setCopied(true);
+              }}
+            />
+            <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-1 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-700 text-white text-xs rounded px-4 py-2">
+              {copied ? "Copied" : "Link"}
+            </div>
+          </div>
         </div>
 
         <h2 className="text-[18px] font-medium text-white mb-0">
@@ -133,14 +77,57 @@ const MarkerPopup = ({
   );
 };
 
+const MarketPopupDeactivated = ({ marker }: { marker: any }) => {
+  const [copied, setCopied] = React.useState(false);
+  return (
+    <Popup>
+      <div className="relative px-6 py-1 bg-gray-800 text-white rounded-lg shadow-md w-full min-w-[250px]">
+        <div className="flex items-center justify-between mb-0">
+          <div className="flex items-center">
+            <Zap className="w-4 h-4 text-yellow-500 mr-1" />
+            <p className="text-sm text-yellow-500 font-semibold">
+              {marker.amount}
+            </p>
+          </div>
+          <div className="relative group">
+            <Link
+              className="w-4 h-4 text-white cursor-pointer"
+              onClick={() => {
+                const url = `https://zapin.me/?pin=${marker.id}`;
+                navigator.clipboard.writeText(url);
+                setCopied(true);
+              }}
+            />
+            <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-1 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-700 text-white text-xs rounded px-4 py-2">
+              {copied ? "Copied" : "Link"}
+            </div>
+          </div>
+        </div>
+
+        <h2 className="text-[18px] font-medium text-white mb-0">
+          {marker.message}
+        </h2>
+
+        <p className="text-xs text-gray-300 text-right">Deactivated</p>
+
+        <div className="absolute bottom-[-7px] left-1/2 transform -translate-x-1/2 w-0 h-0 border-t-8 border-t-gray-800 border-x-8 border-x-transparent"></div>
+      </div>
+    </Popup>
+  );
+};
+
 const Map = ({
   markers,
   setMarkers,
   fetchTotalPins,
-  marketListDeactivated,
+  markerListDeactivated,
   onRightClick,
+  activeMarkerId,
+  setCenter,
+  center,
 }: {
   markers: {
+    id: number;
     amount: number;
     deactivate_at: string;
     lat_long: string;
@@ -149,8 +136,11 @@ const Map = ({
   }[];
   fetchTotalPins: () => void;
   setMarkers: any;
-  marketListDeactivated: any;
+  markerListDeactivated: any;
+  activeMarkerId: number;
   onRightClick: (lat: number, long: number) => void;
+  setCenter: any;
+  center: any;
 }) => {
   const handleRemoveMarker = async (index: number) => {
     setMarkers((prevMarkers: any[]) =>
@@ -172,10 +162,27 @@ const Map = ({
     return null;
   };
 
+  useEffect(() => {
+    markers.map((marker) => {
+      if (marker.id === activeMarkerId) {
+        const lat = parseFloat(marker.lat_long.split(",")[0]);
+        const long = parseFloat(marker.lat_long.split(",")[1]);
+        setCenter([lat, long]);
+      }
+    });
+    markerListDeactivated.map((marker: any) => {
+      if (marker.id === activeMarkerId) {
+        const lat = parseFloat(marker.lat_long.split(",")[0]);
+        const long = parseFloat(marker.lat_long.split(",")[1]);
+        setCenter([lat, long]);
+      }
+    });
+  }, [activeMarkerId, markers, markerListDeactivated, setCenter]);
+
   return (
     <div className="h-screen w-full">
       <MapContainer
-        center={[20, 0]}
+        center={center}
         zoom={3}
         minZoom={3}
         maxBounds={[
@@ -193,42 +200,46 @@ const Map = ({
           attribution=""
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+
         <MapEventsHandler onRightClick={onRightClick} />
-        {marketListDeactivated.map((marker: any, index: number) => {
+
+        {markerListDeactivated.map((marker: any, index: number) => {
           const lat = parseFloat(marker.lat_long.split(",")[0]);
           const long = parseFloat(marker.lat_long.split(",")[1]);
 
           return (
-            <Marker key={index} position={[lat, long]} icon={deactivatedIcon}>
-              <Popup>
-                <div className="relative px-6 py-1 bg-gray-800 text-white rounded-lg shadow-md w-full min-w-[250px]">
-                  <div className="flex items-center mb-0">
-                    <Zap className="w-4 h-4 text-yellow-500 mr-1" />
-                    <p className="text-sm text-yellow-500 font-semibold">
-                      {marker.amount}
-                    </p>
-                  </div>
-
-                  <h2 className="text-[18px] font-medium text-white mb-0">
-                    {marker.message}
-                  </h2>
-
-                  <p className="text-xs text-gray-300 text-right">
-                    Deactivated
-                  </p>
-
-                  <div className="absolute bottom-[-7px] left-1/2 transform -translate-x-1/2 w-0 h-0 border-t-8 border-t-gray-800 border-x-8 border-x-transparent"></div>
-                </div>
-              </Popup>
+            <Marker
+              key={index}
+              position={[lat, long]}
+              icon={deactivatedIcon}
+              ref={(ref) => {
+                if (!ref) return;
+                if (marker.id === activeMarkerId) {
+                  ref.openPopup();
+                }
+              }}
+            >
+              <MarketPopupDeactivated marker={marker} />
             </Marker>
           );
         })}
+
         {markers.map((marker, index) => {
           const lat = parseFloat(marker.lat_long.split(",")[0]);
           const long = parseFloat(marker.lat_long.split(",")[1]);
 
           return (
-            <Marker key={index} position={[lat, long]} icon={customIcon}>
+            <Marker
+              key={index}
+              position={[lat, long]}
+              icon={customIcon}
+              ref={(ref) => {
+                if (!ref) return;
+                if (marker.id === activeMarkerId) {
+                  ref.openPopup();
+                }
+              }}
+            >
               <MarkerPopup
                 marker={marker}
                 onRemove={() => handleRemoveMarker(index)}

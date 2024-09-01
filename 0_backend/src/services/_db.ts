@@ -165,6 +165,7 @@ async function getAllInvoicesDeactivated(
     return await db.all(
       `
       SELECT 
+        id,
         message,
         amount,
         lat_long,
@@ -194,6 +195,7 @@ async function getAllInvoices(db: any, limit: number, offset: number) {
     return await db.all(
       `
       SELECT 
+        id,
         message,
         amount,
         lat_long,

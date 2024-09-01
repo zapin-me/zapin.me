@@ -1,10 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect, useState } from "react";
 
 import { Inter } from "next/font/google";
-
-import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { io } from "socket.io-client";
 import axios from "axios";
+import { requestProvider } from "webln";
 
 import ConfettiExplosion from "@/components/Confetti";
 import PopUpModal from "@/components/PopupModal";
@@ -12,17 +13,19 @@ import Stage0 from "@/components/Stage0";
 import Stage1 from "@/components/Stage1";
 import { MapComponent } from "@/components/MapComponent";
 import Header from "@/components/Header";
-import { requestProvider } from "webln";
 
 const inter = Inter({ subsets: ["latin"] });
 
 const NEXT_PUBLIC_BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
-const NEXT_PUBLIC_LIMIT_MESSAGES = process.env.NEXT_PUBLIC_LIMIT_MESSAGES || 5;
+const NEXT_PUBLIC_LIMIT_MESSAGES = process.env.NEXT_PUBLIC_LIMIT_MESSAGES;
 
 export default function Home() {
+  const searchParams = useSearchParams();
+  const searchPin = searchParams.get("pin");
+
   const [socketId, setSocketId] = useState<string | null>(null);
   const [marketList, setMarkerList] = useState<any[]>([]);
-  const [marketListDeactivated, setMarkerListDeactivated] = useState<any[]>([]);
+  const [markerListDeactivated, setMarkerListDeactivated] = useState<any[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [page, setPage] = useState(1);
   const [stage, setStage] = useState(0);
@@ -32,9 +35,10 @@ export default function Home() {
   const [amount, setAmount] = useState(360);
   const [usersConnected, setUsersConnected] = useState(0);
   const [totalPins, setTotalPins] = useState(0);
-  const [center, setCenter] = useState({ lat: 0, lng: 0 });
+  const [center, setCenter] = useState({ lat: 20, lng: 0 });
   const [marker, setMarker] = useState({ lat: 0, lng: 0 });
   const [totalPinsActive, setTotalPinsActive] = useState(0);
+  const [activeMarkerId, setActiveMarkerId] = useState(0);
 
   const fetchTotalPins = async () => {
     const response = await axios.get(
@@ -76,6 +80,36 @@ export default function Home() {
     ]);
   };
 
+  const cleanForm = () => {
+    setMessage("");
+    setAmount(360);
+  };
+
+  const initWebLN = async () => {
+    try {
+      if (!invoice) return;
+
+      const webln = await requestProvider();
+
+      webln.enable();
+      webln.sendPayment(invoice);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const onRightClick = (lat: number, long: number) => {
+    setCenter({ lat: lat, lng: long });
+    setMarker({ lat: lat, lng: long });
+    setShowModal(true);
+  };
+
+  useEffect(() => {
+    if (searchPin) {
+      setActiveMarkerId(parseInt(searchPin));
+    }
+  }, [searchPin, marketList]);
+
   useEffect(() => {
     if (!socketId) return;
 
@@ -116,6 +150,7 @@ export default function Home() {
       setMarkerList((prevInvoices) => [messageParsed, ...prevInvoices]);
       setRunConfetti(true);
       fetchTotalPins();
+      setActiveMarkerId(messageParsed.id);
 
       setTimeout(() => {
         setRunConfetti(false);
@@ -128,35 +163,11 @@ export default function Home() {
     };
   }, []);
 
-  const cleanForm = () => {
-    setMessage("");
-    setAmount(360);
-  };
-
-  const initWebLN = async () => {
-    try {
-      if (!invoice) return;
-
-      const webln = await requestProvider();
-
-      webln.enable();
-      webln.sendPayment(invoice);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
   useEffect(() => {
     if (!invoice) return;
 
     initWebLN();
   }, [invoice]);
-
-  const onRightClick = (lat: number, long: number) => {
-    setCenter({ lat: lat, lng: long });
-    setMarker({ lat: lat, lng: long });
-    setShowModal(true);
-  };
 
   return (
     <main
@@ -172,9 +183,12 @@ export default function Home() {
       <MapComponent
         onRightClick={onRightClick}
         markers={marketList}
-        marketListDeactivated={marketListDeactivated}
+        markerListDeactivated={markerListDeactivated}
         fetchTotalPins={fetchTotalPins}
         setMarkers={setMarkerList}
+        activeMarkerId={activeMarkerId}
+        setCenter={setCenter}
+        center={center}
       />
       {runConfetti && <ConfettiExplosion />}
       <PopUpModal
