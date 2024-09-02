@@ -1,5 +1,6 @@
 const http = require("http");
 
+import * as NostrTools from "nostr-tools";
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
@@ -12,16 +13,20 @@ import {
   getAllInvoicesDeactivated,
   getInvoiceByInvoice,
   updateInvoiceStatus,
+  updateNostrLink,
 } from "./_db";
+import { sendNostrEvent } from "./_nostr";
 
 const PORT = process.env.PORT || 3000;
 
 type Props = {
   phoenix: Phoenix;
   db: any;
+  pool: any;
+  sk: Uint8Array;
 };
 
-const initExpress = async ({ phoenix, db }: Props) => {
+const initExpress = async ({ phoenix, db, pool, sk }: Props) => {
   try {
     const app = express();
     let connectedClients: any = {};
@@ -79,6 +84,19 @@ const initExpress = async ({ phoenix, db }: Props) => {
         if (!invoiceUpdated2) {
           console.log("Invoice not found");
           return;
+        }
+
+        const nostrNote = await sendNostrEvent({
+          sk,
+          content: `${invoiceUpdated2.message}
+        https://zapin.me/?pin=${invoiceUpdated2.id}`,
+          pool,
+        });
+
+        if (nostrNote) {
+          updateNostrLink(invoiceUpdated2.id, nostrNote.id, db);
+          const url = `https://njump.me/${nostrNote.id}`;
+          invoiceUpdated2.nostr_link = url;
         }
 
         emitEvent(
@@ -258,7 +276,7 @@ const emitEvent = (
   websocket_id: string,
   event: string,
   data: any
-) => {
+): any => {
   try {
     if (connectedClients[websocket_id]) {
       connectedClients[websocket_id].emit(event, data);

@@ -108,7 +108,7 @@ export default function Home() {
     if (searchPin) {
       setActiveMarkerId(parseInt(searchPin));
     }
-  }, [searchPin, marketList]);
+  }, [searchPin]);
 
   useEffect(() => {
     if (!socketId) return;
@@ -184,6 +184,7 @@ export default function Home() {
         onRightClick={onRightClick}
         markers={marketList}
         markerListDeactivated={markerListDeactivated}
+        setMarkerListDeactivated={setMarkerListDeactivated}
         fetchTotalPins={fetchTotalPins}
         setMarkers={setMarkerList}
         activeMarkerId={activeMarkerId}

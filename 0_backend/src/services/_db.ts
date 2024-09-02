@@ -30,6 +30,7 @@ async function initDb() {
         status TEXT,
         lat_long TEXT,
         deactivate_at TEXT,
+        nostr_link TEXT
         created_at TEXT,
         updated_at TEXT
       )
@@ -169,6 +170,7 @@ async function getAllInvoicesDeactivated(
         message,
         amount,
         lat_long,
+        nostr_link,
         deactivate_at,
         updated_at
       FROM invoices 
@@ -199,6 +201,7 @@ async function getAllInvoices(db: any, limit: number, offset: number) {
         message,
         amount,
         lat_long,
+        nostr_link,
         deactivate_at,
         updated_at
       FROM invoices 
@@ -263,6 +266,27 @@ async function updateInvoiceStatus(
   }
 }
 
+async function updateNostrLink(id: number, nostr_link: string, db: any) {
+  if (!db) return null;
+
+  try {
+    const url = `https://njump.me/${nostr_link}`;
+    return db.run(
+      `
+      UPDATE invoices
+      SET 
+          nostr_link = ?,
+          updated_at = datetime('now')
+      WHERE id = ?
+    `,
+      [url, id]
+    );
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
+
 export {
   initDb,
   createInvoice,
@@ -272,4 +296,5 @@ export {
   getInvoiceByInvoice,
   getAllInvoicesDeactivated,
   countInvoices,
+  updateNostrLink,
 };

@@ -6,7 +6,7 @@ import {
   Popup,
   useMapEvents,
 } from "react-leaflet";
-import { Link, Zap } from "lucide-react";
+import { Link, SquareArrowOutUpRight, Zap } from "lucide-react";
 import { icon } from "leaflet";
 import { formatTimeLeft } from "@/Utils/formatTimeLeft";
 import { useCountdown } from "@/Utils/useCountdown";
@@ -45,6 +45,7 @@ const MarkerPopup = ({
               {marker.amount}
             </p>
           </div>
+          <div className="grow" />
           <div className="relative group">
             <Link
               className="w-4 h-4 text-white cursor-pointer"
@@ -58,6 +59,16 @@ const MarkerPopup = ({
               {copied ? "Copied" : "Link"}
             </div>
           </div>
+          {marker.nostr_link && (
+            <div className="relative group ml-2">
+              <a href={marker.nostr_link} target="_blank" rel="noreferrer">
+                <SquareArrowOutUpRight className="w-4 h-4 text-white cursor-pointer" />
+                <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-1 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-700 text-white text-xs rounded px-4 py-2">
+                  Note
+                </div>
+              </a>
+            </div>
+          )}
         </div>
 
         <h2 className="text-[18px] font-medium text-white mb-0">
@@ -79,6 +90,7 @@ const MarkerPopup = ({
 
 const MarketPopupDeactivated = ({ marker }: { marker: any }) => {
   const [copied, setCopied] = React.useState(false);
+
   return (
     <Popup>
       <div className="relative px-6 py-1 bg-gray-800 text-white rounded-lg shadow-md w-full min-w-[250px]">
@@ -89,6 +101,7 @@ const MarketPopupDeactivated = ({ marker }: { marker: any }) => {
               {marker.amount}
             </p>
           </div>
+          <div className="grow" />
           <div className="relative group">
             <Link
               className="w-4 h-4 text-white cursor-pointer"
@@ -102,6 +115,16 @@ const MarketPopupDeactivated = ({ marker }: { marker: any }) => {
               {copied ? "Copied" : "Link"}
             </div>
           </div>
+          {marker.nostr_link && (
+            <div className="relative group ml-2">
+              <a href={marker.nostr_link} target="_blank" rel="noreferrer">
+                <SquareArrowOutUpRight className="w-4 h-4 text-white cursor-pointer" />
+                <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-1 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-700 text-white text-xs rounded px-4 py-2">
+                  Note
+                </div>
+              </a>
+            </div>
+          )}
         </div>
 
         <h2 className="text-[18px] font-medium text-white mb-0">
@@ -121,6 +144,7 @@ const Map = ({
   setMarkers,
   fetchTotalPins,
   markerListDeactivated,
+  setMarkerListDeactivated,
   onRightClick,
   activeMarkerId,
   setCenter,
@@ -137,6 +161,7 @@ const Map = ({
   fetchTotalPins: () => void;
   setMarkers: any;
   markerListDeactivated: any;
+  setMarkerListDeactivated: any;
   activeMarkerId: number;
   onRightClick: (lat: number, long: number) => void;
   setCenter: any;
@@ -146,6 +171,10 @@ const Map = ({
     setMarkers((prevMarkers: any[]) =>
       prevMarkers.filter((_: any, i: number) => i !== index)
     );
+    setMarkerListDeactivated((prevMarkers: any[]) => [
+      ...prevMarkers,
+      markers[index],
+    ]);
     fetchTotalPins();
   };
 

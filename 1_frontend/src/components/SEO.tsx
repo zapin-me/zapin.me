@@ -1,20 +1,20 @@
 import Head from "next/head";
 
-const DOMAIN = "https://zapin.me";
-const DEFAULT_OG_IMAGE = "https://zapin.me/zapin.me.webp";
-
 export default function SEO({
-  title = "Zapin.me",
-  description = "Zapin.me is an open-source platform where users can pin messages on a global map, with visibility determined by the amount of Satoshis paid via the Lightning Network.",
+  title = "zapin.me",
+  description = "an open-source platform where users can pin messages on a global map, with visibility determined by the amount of Satoshis paid via the Lightning Network.",
   siteName = "zapin.me",
-  canonical = DOMAIN,
-  ogImage = DEFAULT_OG_IMAGE,
+  canonical = "https://zapin.me",
+  ogImage = "https://zapin.me/zapin.me.png",
   ogType = "website",
   //   twitterHandle = "@zapin.me",
 }) {
   return (
     <Head>
-      <title key="title">{`${title} – ${siteName}`}</title>
+      <title key="title">{`${title} | ${description}`}</title>
+
+      <link rel="icon" href="map-pin-check-inside.svg" />
+
       <meta name="description" content={description} />
       <meta key="og_type" property="og:type" content={ogType} />
       <meta key="og_title" property="og:title" content={title} />
@@ -25,13 +25,9 @@ export default function SEO({
       />
       <meta key="og_locale" property="og:locale" content="en_IE" />
       <meta key="og_site_name" property="og:site_name" content={siteName} />
-      <meta key="og_url" property="og:url" content={canonical ?? DOMAIN} />
+      <meta key="og_url" property="og:url" content={canonical} />
       <meta key="og_site_name" property="og:site_name" content={siteName} />
-      <meta
-        key="og_image"
-        property="og:image"
-        content={ogImage ?? DEFAULT_OG_IMAGE}
-      />
+      <meta key="og_image" property="og:image" content={ogImage} />
       <meta
         key="og_image:alt"
         property="og:image:alt"
@@ -68,7 +64,7 @@ export default function SEO({
         </>
       )} */}
 
-      <link rel="canonical" href={canonical ?? DOMAIN} />
+      <link rel="canonical" href={canonical} />
 
       <link rel="shortcut icon" href="/favicon.ico" />
     </Head>

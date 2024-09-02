@@ -1,8 +1,8 @@
 import "dotenv/config";
 
-import { initDb, initExpress, initPhoenix } from "./services";
+import { initDb, initExpress, initPhoenix, initNostr } from "./services";
 
-const start = async () => {
+export const start = async () => {
   const db = await initDb();
 
   if (!db) {
@@ -17,7 +17,9 @@ const start = async () => {
     return;
   }
 
-  await initExpress({ phoenix, db });
+  const { pool, sk } = await initNostr();
+
+  await initExpress({ phoenix, db, pool, sk });
 };
 
 start();

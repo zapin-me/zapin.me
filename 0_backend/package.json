@@ -1,6 +1,6 @@
 {
   "name": "backend",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "backend zapin.me",
   "main": "index.js",
   "scripts": {
@@ -23,11 +23,13 @@
     "typescript": "^5.4.3"
   },
   "dependencies": {
+    "@nostr-dev-kit/ndk": "^2.10.0",
     "axios": "^1.7.4",
     "body-parser": "^1.20.2",
     "cords": "^1.0.4",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "nostr-tools": "^2.7.2",
     "phoenix-server-js": "^1.1.1",
     "socket.io": "^4.7.5",
     "sqlite": "^5.1.1",
