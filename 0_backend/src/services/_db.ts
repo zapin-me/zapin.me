@@ -30,7 +30,7 @@ async function initDb() {
         status TEXT,
         lat_long TEXT,
         deactivate_at TEXT,
-        nostr_link TEXT
+        nostr_link TEXT,
         created_at TEXT,
         updated_at TEXT
       )
