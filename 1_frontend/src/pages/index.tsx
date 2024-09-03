@@ -174,7 +174,7 @@ export default function Home() {
       className={`flex flex-col bg-gray-900 text-white ${inter.className} h-screen`}
     >
       <Header
-        version="0.1.0"
+        version="0.1.1"
         setShowModal={setShowModal}
         usersConnected={usersConnected}
         totalPins={totalPins}
@@ -188,7 +188,6 @@ export default function Home() {
         fetchTotalPins={fetchTotalPins}
         setMarkers={setMarkerList}
         activeMarkerId={activeMarkerId}
-        setCenter={setCenter}
         center={center}
       />
       {runConfetti && <ConfettiExplosion />}

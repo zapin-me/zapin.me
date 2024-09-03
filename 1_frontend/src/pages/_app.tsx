@@ -8,7 +8,7 @@ export default function App({ Component, pageProps }: AppProps) {
     <>
       <GoogleAnalytics />
       <SEO />
-      <Component {...pageProps} />;
+      <Component {...pageProps} />
     </>
   );
 }

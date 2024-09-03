@@ -71,7 +71,7 @@ const MarkerPopup = ({
           )}
         </div>
 
-        <h2 className="text-[18px] font-medium text-white mb-0">
+        <h2 className="text-[18px] font-medium text-white mb-0 break-all">
           {marker.message}
         </h2>
 
@@ -127,7 +127,7 @@ const MarketPopupDeactivated = ({ marker }: { marker: any }) => {
           )}
         </div>
 
-        <h2 className="text-[18px] font-medium text-white mb-0">
+        <h2 className="text-[18px] font-medium text-white mb-0 break-all">
           {marker.message}
         </h2>
 
@@ -147,7 +147,6 @@ const Map = ({
   setMarkerListDeactivated,
   onRightClick,
   activeMarkerId,
-  setCenter,
   center,
 }: {
   markers: {
@@ -164,7 +163,6 @@ const Map = ({
   setMarkerListDeactivated: any;
   activeMarkerId: number;
   onRightClick: (lat: number, long: number) => void;
-  setCenter: any;
   center: any;
 }) => {
   const handleRemoveMarker = async (index: number) => {
@@ -190,23 +188,6 @@ const Map = ({
     });
     return null;
   };
-
-  useEffect(() => {
-    markers.map((marker) => {
-      if (marker.id === activeMarkerId) {
-        const lat = parseFloat(marker.lat_long.split(",")[0]);
-        const long = parseFloat(marker.lat_long.split(",")[1]);
-        setCenter([lat, long]);
-      }
-    });
-    markerListDeactivated.map((marker: any) => {
-      if (marker.id === activeMarkerId) {
-        const lat = parseFloat(marker.lat_long.split(",")[0]);
-        const long = parseFloat(marker.lat_long.split(",")[1]);
-        setCenter([lat, long]);
-      }
-    });
-  }, [activeMarkerId, markers, markerListDeactivated, setCenter]);
 
   return (
     <div className="h-screen w-full">
