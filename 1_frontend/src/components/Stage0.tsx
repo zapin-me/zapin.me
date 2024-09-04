@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import axios from "axios";
 import { Eraser, File, Send, Smile } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -52,6 +51,7 @@ const Stage0 = ({
   const [loopNum, setLoopNum] = useState<number>(0);
   const [typingSpeed, setTypingSpeed] = useState<number>(150);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [selectedTime, setSelectedTime] = useState<number | null>(null);
 
   const placeholders = [
     "What's your pin-worthy message?",
@@ -156,6 +156,11 @@ const Stage0 = ({
     setShowEmojiPicker(false);
   };
 
+  const handleTimeSelect = (value: number) => {
+    setSelectedTime(value);
+    setAmount(value);
+  };
+
   return (
     <div className="flex flex-col space-y-2 w-full max-w-[700px] rounded-lg">
       <h2 className="text-2xl font-bold text-white mb-2">
@@ -215,6 +220,39 @@ const Stage0 = ({
             {calculateActiveTime(amount)}
           </span>
         </p>
+      </div>
+
+      <div className="flex space-x-2 justify-between mt-4">
+        <button
+          className={`w-full text-white px-4 py-2 rounded-full transition duration-200 ease-in-out flex items-center justify-center space-x-2 shadow-lg transform ${
+            selectedTime === 1440
+              ? "bg-gradient-to-r from-purple-600 to-pink-500"
+              : "bg-gray-600 hover:bg-gray-500"
+          }`}
+          onClick={() => handleTimeSelect(1440)}
+        >
+          1 Day
+        </button>
+        <button
+          className={`w-full text-white px-4 py-2 rounded-full transition duration-200 ease-in-out flex items-center justify-center space-x-2 shadow-lg transform ${
+            selectedTime === 10080
+              ? "bg-gradient-to-r from-purple-600 to-pink-500"
+              : "bg-gray-600 hover:bg-gray-500"
+          }`}
+          onClick={() => handleTimeSelect(10080)}
+        >
+          1 Week
+        </button>
+        <button
+          className={`w-full text-white px-4 py-2 rounded-full transition duration-200 ease-in-out flex items-center justify-center space-x-2 shadow-lg transform ${
+            selectedTime === 43200
+              ? "bg-gradient-to-r from-purple-600 to-pink-500"
+              : "bg-gray-600 hover:bg-gray-500"
+          }`}
+          onClick={() => handleTimeSelect(43200)}
+        >
+          1 Month
+        </button>
       </div>
 
       <CreatePinMap
