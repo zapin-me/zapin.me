@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import axios from "axios";
 import { Eraser, File, Send, Smile } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -51,7 +52,7 @@ const Stage0 = ({
   const [loopNum, setLoopNum] = useState<number>(0);
   const [typingSpeed, setTypingSpeed] = useState<number>(150);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [selectedTime, setSelectedTime] = useState<number | null>(null);
+  const [selectedTime, setSelectedTime] = useState<number | null>(amount);
 
   const placeholders = [
     "What's your pin-worthy message?",

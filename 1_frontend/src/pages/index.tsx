@@ -32,7 +32,7 @@ export default function Home() {
   const [invoice, setInvoice] = useState<string | null>(null);
   const [runConfetti, setRunConfetti] = useState(false);
   const [message, setMessage] = useState("");
-  const [amount, setAmount] = useState(360);
+  const [amount, setAmount] = useState(1440);
   const [usersConnected, setUsersConnected] = useState(0);
   const [totalPins, setTotalPins] = useState(0);
   const [center, setCenter] = useState({ lat: 20, lng: 0 });
