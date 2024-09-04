@@ -51,7 +51,7 @@ const Stage0 = ({
   const [loopNum, setLoopNum] = useState<number>(0);
   const [typingSpeed, setTypingSpeed] = useState<number>(150);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [selectedTime, setSelectedTime] = useState<number | null>(null);
+  const [selectedTime, setSelectedTime] = useState<number>(1440);
 
   const placeholders = [
     "What's your pin-worthy message?",
@@ -65,6 +65,7 @@ const Stage0 = ({
   ];
 
   useEffect(() => {
+
     const handleType = () => {
       const i = loopNum % placeholders.length;
       const fullText = placeholders[i];
@@ -87,23 +88,25 @@ const Stage0 = ({
     const timer = setTimeout(handleType, typingSpeed);
 
     return () => clearTimeout(timer);
-  }, [placeholder, isDeleting, typingSpeed, loopNum]);
+  }, [placeholder, isDeleting, typingSpeed, loopNum, setAmount]);
 
   const calculateActiveTime = (sats: number) => {
     const totalSeconds = sats * 60;
-
+  
     const years = Math.floor(totalSeconds / (365 * 24 * 3600));
-    const months = Math.floor(
-      (totalSeconds % (365 * 24 * 3600)) / (30 * 24 * 3600)
-    );
-    const weeks = Math.floor(
-      (totalSeconds % (30 * 24 * 3600)) / (7 * 24 * 3600)
-    );
-    const days = Math.floor((totalSeconds % (7 * 24 * 3600)) / (24 * 3600));
+    const months = Math.floor(totalSeconds / (30 * 24 * 3600));
+    let weeks = Math.floor((totalSeconds % (30 * 24 * 3600)) / (7 * 24 * 3600));
+    let days = Math.floor((totalSeconds % (7 * 24 * 3600)) / (24 * 3600));
     const hours = Math.floor((totalSeconds % (24 * 3600)) / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = totalSeconds % 60;
-
+  
+    if (sats == 40320) {
+      weeks = 0;
+      days = 0;
+      return "1 month";
+    }
+  
     const timeUnits = [
       { value: years, label: "year" },
       { value: months, label: "month" },
@@ -113,13 +116,15 @@ const Stage0 = ({
       { value: minutes, label: "minute" },
       { value: seconds, label: "second" },
     ];
-
-    const formattedUnits = timeUnits
-      .filter((unit) => unit.value > 0)
-      .slice(0, 2)
+  
+    // Only show the top two largest non-zero units
+    const filteredUnits = timeUnits.filter((unit) => unit.value > 0);
+  
+    const formattedUnits = filteredUnits
+      .slice(0, 2) // Limit to the top two largest non-zero units
       .map((unit) => `${unit.value} ${unit.label}${unit.value > 1 ? "s" : ""}`)
       .join(", ");
-
+  
     return formattedUnits || "less than a minute";
   };
 
@@ -158,7 +163,7 @@ const Stage0 = ({
 
   const handleTimeSelect = (value: number) => {
     setSelectedTime(value);
-    setAmount(value);
+    setAmount(value); 
   };
 
   return (
@@ -245,11 +250,11 @@ const Stage0 = ({
         </button>
         <button
           className={`w-full text-white px-4 py-2 rounded-full transition duration-200 ease-in-out flex items-center justify-center space-x-2 shadow-lg transform ${
-            selectedTime === 43200
+            selectedTime === 40320
               ? "bg-gradient-to-r from-purple-600 to-pink-500"
               : "bg-gray-600 hover:bg-gray-500"
           }`}
-          onClick={() => handleTimeSelect(43200)}
+          onClick={() => handleTimeSelect(40320)}
         >
           1 Month
         </button>
