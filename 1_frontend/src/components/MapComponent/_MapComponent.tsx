@@ -9,7 +9,6 @@ import {
 import { Link, SquareArrowOutUpRight, Zap } from "lucide-react";
 import { icon } from "leaflet";
 import { formatTimeLeft } from "@/Utils/formatTimeLeft";
-import { useCountdown } from "@/Utils/useCountdown";
 
 const deactivatedIcon = icon({
   iconUrl: "./map-pin-check-inside-deactivated.svg",
@@ -32,7 +31,6 @@ const MarkerPopup = ({
   marker: any;
   onRemove: () => void;
 }) => {
-  const timeLeft = useCountdown(marker.deactivate_at, onRemove);
   const [copied, setCopied] = React.useState(false);
 
   return (
@@ -78,7 +76,7 @@ const MarkerPopup = ({
         <p className="text-xs text-gray-300 text-right">
           Expires in:{" "}
           <span className="font-bold text-white">
-            {formatTimeLeft(timeLeft)}
+            {formatTimeLeft(marker.deactivate_at)}
           </span>
         </p>
 
@@ -88,7 +86,7 @@ const MarkerPopup = ({
   );
 };
 
-const MarketPopupDeactivated = ({ marker }: { marker: any }) => {
+const MarkerPopupDeactivated = ({ marker }: { marker: any }) => {
   const [copied, setCopied] = React.useState(false);
 
   return (
@@ -145,6 +143,7 @@ const Map = ({
   fetchTotalPins,
   markerListDeactivated,
   setMarkerListDeactivated,
+  filterType,
   onRightClick,
   activeMarkerId,
   center,
@@ -162,6 +161,7 @@ const Map = ({
   markerListDeactivated: any;
   setMarkerListDeactivated: any;
   activeMarkerId: number;
+  filterType: string[];
   onRightClick: (lat: number, long: number) => void;
   center: any;
 }) => {
@@ -189,6 +189,20 @@ const Map = ({
     return null;
   };
 
+  // Function to determine if the marker is deactivated
+  const isMarkerDeactivated = (deactivate_at: string) => {
+    const currentTime = new Date().getTime();
+    const deactivateTime = parseInt(deactivate_at) * 1000;
+    return deactivateTime <= currentTime;
+  };
+
+  const filteredMarkers = filterType.includes("all")
+    ? [...markers, ...markerListDeactivated]
+    : [
+        ...(filterType.includes("active") ? markers : []),
+        ...(filterType.includes("deactivated") ? markerListDeactivated : []),
+      ];
+
   return (
     <div className="h-screen w-full">
       <MapContainer
@@ -213,15 +227,17 @@ const Map = ({
 
         <MapEventsHandler onRightClick={onRightClick} />
 
-        {markerListDeactivated.map((marker: any, index: number) => {
+        {filteredMarkers.map((marker: any, index: any) => {
           const lat = parseFloat(marker.lat_long.split(",")[0]);
           const long = parseFloat(marker.lat_long.split(",")[1]);
+
+          const isDeactivated = isMarkerDeactivated(marker.deactivate_at);
 
           return (
             <Marker
               key={index}
               position={[lat, long]}
-              icon={deactivatedIcon}
+              icon={isDeactivated ? deactivatedIcon : customIcon}
               ref={(ref) => {
                 if (!ref) return;
                 if (marker.id === activeMarkerId) {
@@ -229,31 +245,14 @@ const Map = ({
                 }
               }}
             >
-              <MarketPopupDeactivated marker={marker} />
-            </Marker>
-          );
-        })}
-
-        {markers.map((marker, index) => {
-          const lat = parseFloat(marker.lat_long.split(",")[0]);
-          const long = parseFloat(marker.lat_long.split(",")[1]);
-
-          return (
-            <Marker
-              key={index}
-              position={[lat, long]}
-              icon={customIcon}
-              ref={(ref) => {
-                if (!ref) return;
-                if (marker.id === activeMarkerId) {
-                  ref.openPopup();
-                }
-              }}
-            >
-              <MarkerPopup
-                marker={marker}
-                onRemove={() => handleRemoveMarker(index)}
-              />
+              {isDeactivated ? (
+                <MarkerPopupDeactivated marker={marker} />
+              ) : (
+                <MarkerPopup
+                  marker={marker}
+                  onRemove={() => handleRemoveMarker(index)}
+                />
+              )}
             </Marker>
           );
         })}

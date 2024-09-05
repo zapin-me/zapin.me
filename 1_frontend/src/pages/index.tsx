@@ -39,6 +39,7 @@ export default function Home() {
   const [marker, setMarker] = useState({ lat: 0, lng: 0 });
   const [totalPinsActive, setTotalPinsActive] = useState(0);
   const [activeMarkerId, setActiveMarkerId] = useState(0);
+  const [filterType, setFilterType] = useState<string[]>(["all"]);
 
   const fetchTotalPins = async () => {
     const response = await axios.get(
@@ -179,6 +180,7 @@ export default function Home() {
         usersConnected={usersConnected}
         totalPins={totalPins}
         activePins={totalPinsActive}
+        setFilterType={setFilterType} 
       />
       <MapComponent
         onRightClick={onRightClick}
@@ -189,6 +191,7 @@ export default function Home() {
         setMarkers={setMarkerList}
         activeMarkerId={activeMarkerId}
         center={center}
+        filterType={filterType} 
       />
       {runConfetti && <ConfettiExplosion />}
       <PopUpModal
