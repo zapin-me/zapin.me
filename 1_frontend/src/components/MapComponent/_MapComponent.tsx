@@ -71,7 +71,7 @@ const MarkerPopup = ({
           )}
         </div>
 
-        <h2 className="text-[18px] font-medium text-white mb-0 break-all">
+        <h2 className="text-[18px] font-medium text-white mb-0 break-words">
           {marker.message}
         </h2>
 
@@ -127,7 +127,7 @@ const MarketPopupDeactivated = ({ marker }: { marker: any }) => {
           )}
         </div>
 
-        <h2 className="text-[18px] font-medium text-white mb-0 break-all">
+        <h2 className="text-[18px] font-medium text-white mb-0 break-words">
           {marker.message}
         </h2>
 
