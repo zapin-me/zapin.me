@@ -150,7 +150,7 @@ export default function Home() {
       setMarkerList((prevInvoices) => [messageParsed, ...prevInvoices]);
       setRunConfetti(true);
       fetchTotalPins();
-      setActiveMarkerId(messageParsed.id);
+      // setActiveMarkerId(messageParsed.id);
 
       setTimeout(() => {
         setRunConfetti(false);
