@@ -9,6 +9,7 @@ import {
 import { Link, SquareArrowOutUpRight, Zap } from "lucide-react";
 import { icon } from "leaflet";
 import { formatTimeLeft } from "@/Utils/formatTimeLeft";
+import { useCountdown } from "@/Utils/useCountdown";
 
 const deactivatedIcon = icon({
   iconUrl: "./map-pin-check-inside-deactivated.svg",
@@ -32,6 +33,7 @@ const MarkerPopup = ({
   onRemove: () => void;
 }) => {
   const [copied, setCopied] = React.useState(false);
+  const timeLeft = useCountdown(marker.deactivate_at, onRemove);
 
   return (
     <Popup>
@@ -76,7 +78,7 @@ const MarkerPopup = ({
         <p className="text-xs text-gray-300 text-right">
           Expires in:{" "}
           <span className="font-bold text-white">
-            {formatTimeLeft(marker.deactivate_at)}
+            {formatTimeLeft(timeLeft)}
           </span>
         </p>
 
