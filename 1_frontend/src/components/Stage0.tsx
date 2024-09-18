@@ -1,9 +1,11 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import axios from "axios";
-import { Eraser, File, Send, Smile } from "lucide-react";
+import { Eraser, Send, Smile } from "lucide-react";
 import { useState, useEffect } from "react";
 import { z } from "zod";
 import { CreatePinMap } from "./MapComponent";
 import EmojiPicker from "emoji-picker-react";
+import { sendEvent } from "@/Utils/analytics";
 
 const NEXT_PUBLIC_BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -65,7 +67,6 @@ const Stage0 = ({
   ];
 
   useEffect(() => {
-
     const handleType = () => {
       const i = loopNum % placeholders.length;
       const fullText = placeholders[i];
@@ -88,11 +89,11 @@ const Stage0 = ({
     const timer = setTimeout(handleType, typingSpeed);
 
     return () => clearTimeout(timer);
-  }, [placeholder, isDeleting, typingSpeed, loopNum, setAmount]);
+  }, [placeholder, isDeleting, typingSpeed, loopNum]);
 
   const calculateActiveTime = (sats: number) => {
     const totalSeconds = sats * 60;
-  
+
     const years = Math.floor(totalSeconds / (365 * 24 * 3600));
     const months = Math.floor(totalSeconds / (30 * 24 * 3600));
     let weeks = Math.floor((totalSeconds % (30 * 24 * 3600)) / (7 * 24 * 3600));
@@ -100,13 +101,13 @@ const Stage0 = ({
     const hours = Math.floor((totalSeconds % (24 * 3600)) / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = totalSeconds % 60;
-  
+
     if (sats == 40320) {
       weeks = 0;
       days = 0;
       return "1 month";
     }
-  
+
     const timeUnits = [
       { value: years, label: "year" },
       { value: months, label: "month" },
@@ -116,15 +117,15 @@ const Stage0 = ({
       { value: minutes, label: "minute" },
       { value: seconds, label: "second" },
     ];
-  
+
     // Only show the top two largest non-zero units
     const filteredUnits = timeUnits.filter((unit) => unit.value > 0);
-  
+
     const formattedUnits = filteredUnits
       .slice(0, 2) // Limit to the top two largest non-zero units
       .map((unit) => `${unit.value} ${unit.label}${unit.value > 1 ? "s" : ""}`)
       .join(", ");
-  
+
     return formattedUnits || "less than a minute";
   };
 
@@ -139,6 +140,11 @@ const Stage0 = ({
       }
     );
     setInvoice(response.data.invoiceData.serialized);
+    sendEvent({
+      action: "generate_invoice",
+      category: "Ecommerce",
+      label: "Invoice Generated",
+    });
     setStage(1);
   };
 
@@ -163,11 +169,11 @@ const Stage0 = ({
 
   const handleTimeSelect = (value: number) => {
     setSelectedTime(value);
-    setAmount(value); 
+    setAmount(value);
   };
 
   return (
-    <div className="flex flex-col space-y-2 w-full max-w-[700px] rounded-lg">
+    <div className="flex flex-col space-y-2 w-full max-w-[700px] rounded-lg z-2">
       <h2 className="text-2xl font-bold text-white mb-2">
         Drop a pin on the map!
       </h2>

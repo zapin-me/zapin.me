@@ -9,15 +9,15 @@ const GoogleAnalytics = () => {
         src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_TAG}`}
       />
 
-      <Script id="" strategy="lazyOnload">
+      <Script id="ga-init" strategy="lazyOnload">
         {`
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', '${process.env.NEXT_PUBLIC_GA_TAG}', {
-              page_path: window.location.pathname,
-              });
-          `}
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', '${process.env.NEXT_PUBLIC_GA_TAG}', {
+            page_path: window.location.pathname,
+          });
+        `}
       </Script>
     </>
   );

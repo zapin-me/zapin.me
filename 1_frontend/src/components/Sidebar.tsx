@@ -42,7 +42,7 @@ type SidebarProps = {
   setSidebarOpen: (open: boolean) => void;
   messages: Message[];
   setActiveMarkerId: (id: number) => void;
-  activeMarkerId: number; // Adicionado para identificar o marcador ativo
+  activeMarkerId: number;
 };
 
 export function Sidebar({
@@ -162,7 +162,7 @@ export function Sidebar({
 
   return (
     <div
-      className={`fixed top-0 left-0 h-[calc(100vh-56px)] bg-indigo-800 border-r border-indigo-700 flex flex-col py-1 px-2 transition-transform duration-300 z-50 md:z-1 ${
+      className={`fixed top-0 left-0 h-[calc(100vh-56px)] bg-indigo-800 border-r border-indigo-700 flex flex-col py-1 px-2 transition-transform duration-300 z-40 md:-z-1 ${
         sidebarOpen ? "translate-x-0" : "-translate-x-full"
       } md:relative md:translate-x-0 md:w-80`}
     >

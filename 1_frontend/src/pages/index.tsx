@@ -14,6 +14,7 @@ import Stage1 from "@/components/Stage1";
 import { MapComponent } from "@/components/MapComponent";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
+import { sendEvent } from "@/Utils/analytics";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -136,6 +137,12 @@ export default function Home() {
     });
 
     socket.on("paid", () => {
+      sendEvent({
+        action: "purchase",
+        category: "Ecommerce",
+        label: "Invoice Paid",
+        value: amount,
+      });
       setInvoice(null);
       setStage(0);
       setShowModal(false);
@@ -169,6 +176,16 @@ export default function Home() {
 
     initWebLN();
   }, [invoice]);
+
+  useEffect(() => {
+    if (showModal) {
+      sendEvent({
+        action: "open_modal",
+        category: "Engagement",
+        label: "Create Marker Modal Opened",
+      });
+    }
+  }, [showModal]);
 
   return (
     <main
