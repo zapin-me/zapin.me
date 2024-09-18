@@ -13,6 +13,7 @@ import Stage0 from "@/components/Stage0";
 import Stage1 from "@/components/Stage1";
 import { MapComponent } from "@/components/MapComponent";
 import Header from "@/components/Header";
+import Sidebar from "@/components/Sidebar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -39,6 +40,7 @@ export default function Home() {
   const [marker, setMarker] = useState({ lat: 0, lng: 0 });
   const [totalPinsActive, setTotalPinsActive] = useState(0);
   const [activeMarkerId, setActiveMarkerId] = useState(0);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const fetchTotalPins = async () => {
     const response = await axios.get(
@@ -150,7 +152,6 @@ export default function Home() {
       setMarkerList((prevInvoices) => [messageParsed, ...prevInvoices]);
       setRunConfetti(true);
       fetchTotalPins();
-      // setActiveMarkerId(messageParsed.id);
 
       setTimeout(() => {
         setRunConfetti(false);
@@ -179,17 +180,30 @@ export default function Home() {
         usersConnected={usersConnected}
         totalPins={totalPins}
         activePins={totalPinsActive}
+        setSidebarOpen={setSidebarOpen}
       />
-      <MapComponent
-        onRightClick={onRightClick}
-        markers={marketList}
-        markerListDeactivated={markerListDeactivated}
-        setMarkerListDeactivated={setMarkerListDeactivated}
-        fetchTotalPins={fetchTotalPins}
-        setMarkers={setMarkerList}
-        activeMarkerId={activeMarkerId}
-        center={center}
-      />
+      <div className="flex flex-1">
+        <Sidebar
+          sidebarOpen={sidebarOpen}
+          setSidebarOpen={setSidebarOpen}
+          messages={[...marketList, ...markerListDeactivated]}
+          setActiveMarkerId={setActiveMarkerId}
+          activeMarkerId={activeMarkerId}
+        />
+        <div className="flex-1">
+          <MapComponent
+            onRightClick={onRightClick}
+            markers={marketList}
+            markerListDeactivated={markerListDeactivated}
+            setMarkerListDeactivated={setMarkerListDeactivated}
+            fetchTotalPins={fetchTotalPins}
+            setMarkers={setMarkerList}
+            activeMarkerId={activeMarkerId}
+            center={center}
+            setActiveMarkerId={setActiveMarkerId}
+          />
+        </div>
+      </div>
       {runConfetti && <ConfettiExplosion />}
       <PopUpModal
         showModal={showModal}

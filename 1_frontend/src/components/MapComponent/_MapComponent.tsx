@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {
   MapContainer,
   Marker,
@@ -148,6 +148,7 @@ const Map = ({
   onRightClick,
   activeMarkerId,
   center,
+  setActiveMarkerId,
 }: {
   markers: {
     id: number;
@@ -164,6 +165,7 @@ const Map = ({
   activeMarkerId: number;
   onRightClick: (lat: number, long: number) => void;
   center: any;
+  setActiveMarkerId: any;
 }) => {
   const handleRemoveMarker = async (index: number) => {
     setMarkers((prevMarkers: any[]) =>
@@ -190,7 +192,7 @@ const Map = ({
   };
 
   return (
-    <div className="h-screen w-full">
+    <div className="w-full">
       <MapContainer
         center={center}
         zoom={3}

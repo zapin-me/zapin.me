@@ -4,6 +4,7 @@ import {
   MapPinCheckInside,
   MapPinPlusIcon,
   Tv,
+  Menu, // Import the Menu icon
 } from "lucide-react";
 
 import Tooltip from "@/components/Tooltip";
@@ -16,22 +17,32 @@ const Header = ({
   totalPins,
   activePins,
   version,
+  setSidebarOpen, // Receive setSidebarOpen as a prop
 }: {
   setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
   usersConnected: number;
   totalPins: number;
   activePins: number;
   version: string;
+  setSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>; // Add setSidebarOpen to props type
 }) => {
   return (
     <div className="flex flex-col md:flex-row items-center px-4 sm:px-8 py-2 w-full bg-indigo-700 shadow-2xl h-auto md:h-[56px] space-y-1 sm:space-y-0">
-      <div className="flex justify-between items-center w-full md:w-auto">
-        <Link href="/" className="flex items-center">
-          <h1 className="text-2xl sm:text-3xl font-bold text-white">
+      <div className="flex md:justify-between md:items-center w-full md:w-auto">
+        {/* Menu button for mobile devices */}
+        <button
+          className="md:hidden mr-2 order-4"
+          onClick={() => setSidebarOpen(true)}
+        >
+          <Menu size={24} className="text-white" />
+        </button>
+        <div className="grow order-3"></div>
+        <Link href="/" className="flex items-center order-1">
+          <h1 className="text-3xl lg:text-3xl font-bold text-white ">
             zapin.me
           </h1>
         </Link>
-        <span className="text-pink-100 text-[10px] ml-1 md:pt-[14px]">
+        <span className="text-pink-100 text-[10px] ml-1 md:pt-[14px] order-2">
           v{version}
         </span>
       </div>
