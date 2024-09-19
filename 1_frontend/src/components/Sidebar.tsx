@@ -354,7 +354,7 @@ export function Sidebar({
           ) : (
             sortedInactiveMessages.map((message) => (
               <MessageItem
-                key={message.id}
+                key={`${message.id}-${message.active ? "active" : "inactive"}`}
                 message={message}
                 isSelected={message.id === activeMarkerId}
                 setActiveMarkerId={setActiveMarkerId}
