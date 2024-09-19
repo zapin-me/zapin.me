@@ -173,7 +173,7 @@ const Stage0 = ({
   };
 
   return (
-    <div className="flex flex-col space-y-2 w-full max-w-[700px] rounded-lg z-50">
+    <div className="flex flex-col space-y-2 w-full md:min-w-[600px] max-w-[700px] rounded-lg z-50">
       <h2 className="text-2xl font-bold text-white mb-2">
         Drop a pin on the map!
       </h2>

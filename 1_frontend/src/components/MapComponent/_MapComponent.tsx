@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   MapContainer,
   Marker,
@@ -10,6 +10,7 @@ import { Link, SquareArrowOutUpRight, Zap } from "lucide-react";
 import { icon } from "leaflet";
 import { formatTimeLeft } from "@/Utils/formatTimeLeft";
 import { useCountdown } from "@/Utils/useCountdown";
+import { getRelativeTimeDifference } from "@/Utils/getRelativeTimeDifference";
 
 const deactivatedIcon = icon({
   iconUrl: "./map-pin-check-inside-deactivated.svg",
@@ -90,6 +91,9 @@ const MarkerPopup = ({
 
 const MarketPopupDeactivated = ({ marker }: { marker: any }) => {
   const [copied, setCopied] = React.useState(false);
+  const [relativeDeactivateTime, setRelativeDeactivateTime] = useState(
+    getRelativeTimeDifference(marker.deactivate_at)
+  );
 
   return (
     <Popup>
@@ -131,7 +135,9 @@ const MarketPopupDeactivated = ({ marker }: { marker: any }) => {
           {marker.message}
         </h2>
 
-        <p className="text-xs text-gray-300 text-right">Deactivated</p>
+        <p className="text-[10px] text-gray-300 mt-1 text-right">
+          {relativeDeactivateTime}
+        </p>
 
         <div className="absolute bottom-[-7px] left-1/2 transform -translate-x-1/2 w-0 h-0 border-t-8 border-t-gray-800 border-x-8 border-x-transparent"></div>
       </div>

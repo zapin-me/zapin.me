@@ -1,6 +1,7 @@
-import React, { use, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Zap, Link as LinkIcon, SquareArrowOutUpRight } from "lucide-react";
 import { useState } from "react";
+import { getRelativeTimeDifference } from "@/Utils/getRelativeTimeDifference";
 
 type Message = {
   id: number;
@@ -19,26 +20,6 @@ type MessageItemProps = {
   isSelected: boolean;
   setActiveMarkerId: (id: number) => void;
 };
-
-function getRelativeTimeDifference(deactivateAt: string): string {
-  const now = new Date();
-  const deactivateDate = new Date(parseInt(deactivateAt) * 1000); // Assuming UNIX timestamp in seconds
-  const diffInMs = deactivateDate.getTime() - now.getTime();
-
-  const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
-
-  const minutes = Math.floor(diffInMs / (1000 * 60));
-  const hours = Math.floor(diffInMs / (1000 * 60 * 60));
-  const days = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
-
-  if (Math.abs(days) >= 1) {
-    return rtf.format(days, "day");
-  } else if (Math.abs(hours) >= 1) {
-    return rtf.format(hours, "hour");
-  } else {
-    return rtf.format(minutes, "minute");
-  }
-}
 
 const MessageItem: React.FC<MessageItemProps> = ({
   message,
@@ -115,11 +96,9 @@ const MessageItem: React.FC<MessageItemProps> = ({
         </div>
       </div>
       <h2 className="text-sm font-medium break-words">{message.message}</h2>
-      {/* Display the relative deactivate time */}
+
       <p className="text-[10px] text-gray-300 mt-1 text-right">
-        {message.active
-          ? `${relativeDeactivateTime}`
-          : `${relativeDeactivateTime}`}
+        {relativeDeactivateTime}
       </p>
 
       <div className="absolute top-2 right-2">
