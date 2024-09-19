@@ -4,7 +4,7 @@ import {
   MapPinCheckInside,
   MapPinPlusIcon,
   Tv,
-  Menu, // Import the Menu icon
+  Menu,
 } from "lucide-react";
 
 import Tooltip from "@/components/Tooltip";
@@ -17,14 +17,14 @@ const Header = ({
   totalPins,
   activePins,
   version,
-  setSidebarOpen, // Receive setSidebarOpen as a prop
+  setSidebarOpen,
 }: {
   setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
   usersConnected: number;
   totalPins: number;
   activePins: number;
   version: string;
-  setSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>; // Add setSidebarOpen to props type
+  setSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   return (
     <div className="flex flex-col md:flex-row items-center px-4 sm:px-8 py-2 w-full bg-indigo-700 shadow-2xl h-auto md:h-[56px] space-y-1 sm:space-y-0">

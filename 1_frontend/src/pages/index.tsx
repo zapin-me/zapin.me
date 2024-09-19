@@ -42,6 +42,8 @@ export default function Home() {
   const [totalPinsActive, setTotalPinsActive] = useState(0);
   const [activeMarkerId, setActiveMarkerId] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [loadingActive, setLoadingActive] = useState<boolean>(true);
+  const [loadingInactive, setLoadingInactive] = useState<boolean>(true);
 
   const fetchTotalPins = async () => {
     const response = await axios.get(
@@ -53,34 +55,48 @@ export default function Home() {
   };
 
   const fetchInvoices = async (page: number) => {
-    const response = await axios.get(`${NEXT_PUBLIC_BACKEND_URL}/invoices`, {
-      params: {
-        page: page,
-        limit: NEXT_PUBLIC_LIMIT_MESSAGES,
-      },
-    });
-
-    setMarkerList((prevInvoices) => [
-      ...prevInvoices,
-      ...response.data.invoices,
-    ]);
-  };
-
-  const fetchInvoicesDeactivated = async (page: number) => {
-    const response = await axios.get(
-      `${NEXT_PUBLIC_BACKEND_URL}/invoices/deactivated`,
-      {
+    setLoadingActive(true);
+    try {
+      const response = await axios.get(`${NEXT_PUBLIC_BACKEND_URL}/invoices`, {
         params: {
           page: page,
           limit: NEXT_PUBLIC_LIMIT_MESSAGES,
         },
-      }
-    );
+      });
 
-    setMarkerListDeactivated((prevInvoices) => [
-      ...prevInvoices,
-      ...response.data.invoices,
-    ]);
+      setMarkerList((prevInvoices) => [
+        ...prevInvoices,
+        ...response.data.invoices,
+      ]);
+    } catch (error) {
+      console.error("Erro ao buscar marcadores ativos:", error);
+    } finally {
+      setLoadingActive(false);
+    }
+  };
+
+  const fetchInvoicesDeactivated = async (page: number) => {
+    setLoadingInactive(true);
+    try {
+      const response = await axios.get(
+        `${NEXT_PUBLIC_BACKEND_URL}/invoices/deactivated`,
+        {
+          params: {
+            page: page,
+            limit: NEXT_PUBLIC_LIMIT_MESSAGES,
+          },
+        }
+      );
+
+      setMarkerListDeactivated((prevInvoices) => [
+        ...prevInvoices,
+        ...response.data.invoices,
+      ]);
+    } catch (error) {
+      console.error("Erro ao buscar marcadores inativos:", error);
+    } finally {
+      setLoadingInactive(false);
+    }
   };
 
   const cleanForm = () => {
@@ -192,7 +208,7 @@ export default function Home() {
       className={`flex flex-col bg-gray-900 text-white ${inter.className} h-screen`}
     >
       <Header
-        version="0.1.1"
+        version="0.2.0"
         setShowModal={setShowModal}
         usersConnected={usersConnected}
         totalPins={totalPins}
@@ -203,10 +219,14 @@ export default function Home() {
         <Sidebar
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
-          messages={[...marketList, ...markerListDeactivated]}
+          activeMessages={marketList}
+          inactiveMessages={markerListDeactivated}
+          loadingActive={loadingActive}
+          loadingInactive={loadingInactive}
           setActiveMarkerId={setActiveMarkerId}
           activeMarkerId={activeMarkerId}
         />
+
         <div className="flex-1">
           <MapComponent
             onRightClick={onRightClick}

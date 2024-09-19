@@ -1,15 +1,6 @@
-"use client";
-
+/* Sidebar.tsx */
 import React, { useState, useMemo, useEffect } from "react";
-import {
-  Filter,
-  X,
-  Zap,
-  Link as LinkIcon,
-  SquareArrowOutUpRight,
-  Loader2,
-  RotateCcw,
-} from "lucide-react";
+import { Filter, X, Zap, Loader2, RotateCcw } from "lucide-react";
 import { Input } from "./ui/input";
 import { Popover, PopoverTrigger, PopoverContent } from "./ui/popover";
 import { Calendar as CalendarComponent } from "./ui/calendar";
@@ -22,6 +13,7 @@ import {
   SelectValue,
 } from "./ui/select";
 import MotionNumber from "motion-number";
+import MessageItem from "./MessageItem";
 
 type Message = {
   id: number;
@@ -29,8 +21,8 @@ type Message = {
   amount: number;
   lat_long: string;
   nostr_link: string;
-  deactivate_at: string;
-  updated_at: string;
+  deactivate_at: string; // Unix timestamp in seconds as string
+  updated_at: string; // ISO string
   date: Date;
   active: boolean;
 };
@@ -40,7 +32,10 @@ type SortOption = "dateAsc" | "dateDesc" | "satsAsc" | "satsDesc";
 type SidebarProps = {
   sidebarOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
-  messages: Message[];
+  activeMessages: Message[];
+  inactiveMessages: Message[];
+  loadingActive: boolean;
+  loadingInactive: boolean;
   setActiveMarkerId: (id: number) => void;
   activeMarkerId: number;
 };
@@ -48,7 +43,10 @@ type SidebarProps = {
 export function Sidebar({
   sidebarOpen,
   setSidebarOpen,
-  messages,
+  activeMessages,
+  inactiveMessages,
+  loadingActive,
+  loadingInactive,
   setActiveMarkerId,
   activeMarkerId,
 }: SidebarProps) {
@@ -59,18 +57,17 @@ export function Sidebar({
     status: "all",
     minSats: 0,
   });
-  const [sortOption, setSortOption] = useState<SortOption>("dateDesc");
-  const [copied, setCopied] = useState(false);
+  const [sortOption, setSortOption] = useState<SortOption>("satsDesc");
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   const placeholderMessages = [
-    "Search for messages...",
+    "Search for markers...",
     "Looking for something?",
-    "Type to search messages",
-    "Find a specific message",
+    "Type to search markers",
+    "Find a specific marker",
     "Search by keywords...",
     "What are you searching for?",
-    "Filter messages here...",
+    "Filter markers here...",
   ];
 
   const [randomPlaceholder] = useState(() => {
@@ -94,19 +91,20 @@ export function Sidebar({
     return () => clearTimeout(typingTimeout);
   }, [charIndex, randomPlaceholder]);
 
-  const processedMessages = useMemo(() => {
-    return messages.map((msg) => {
+  // Combine active and inactive messages for processing
+  const combinedMessages = useMemo(() => {
+    return [...activeMessages, ...inactiveMessages].map((msg) => {
       const date = new Date(msg.updated_at);
-      const deactivateAt = new Date(parseInt(msg.deactivate_at) * 1000);
-      const active = deactivateAt > new Date();
+      const deactivateAt = new Date(parseInt(msg.deactivate_at, 10) * 1000);
+      const isActive = deactivateAt > new Date();
 
       return {
         ...msg,
         date,
-        active,
+        active: isActive,
       };
     });
-  }, [messages]);
+  }, [activeMessages, inactiveMessages]);
 
   const resetFilters = () => {
     setFilters({
@@ -119,39 +117,45 @@ export function Sidebar({
     setIsPopoverOpen(false);
   };
 
-  const filteredMessages = processedMessages.filter((message) => {
-    const matchesSearch = message.message
-      .toLowerCase()
-      .includes(filters.search.toLowerCase());
+  const filteredMessages = useMemo(() => {
+    return combinedMessages.filter((message) => {
+      const matchesSearch = message.message
+        .toLowerCase()
+        .includes(filters.search.toLowerCase());
 
-    const matchesStatus =
-      filters.status === "all" ||
-      (filters.status === "active" && message.active) ||
-      (filters.status === "inactive" && !message.active);
+      const matchesStatus =
+        filters.status === "all" ||
+        (filters.status === "active" && message.active) ||
+        (filters.status === "inactive" && !message.active);
 
-    const matchesMinSats = message.amount >= filters.minSats;
+      const matchesMinSats = message.amount >= filters.minSats;
 
-    const matchesDateRange =
-      (!filters.startDate || message.date >= filters.startDate) &&
-      (!filters.endDate || message.date <= filters.endDate);
+      const matchesDateRange =
+        (!filters.startDate || message.date >= filters.startDate) &&
+        (!filters.endDate || message.date <= filters.endDate);
 
-    return matchesSearch && matchesStatus && matchesMinSats && matchesDateRange;
-  });
+      return (
+        matchesSearch && matchesStatus && matchesMinSats && matchesDateRange
+      );
+    });
+  }, [combinedMessages, filters]);
 
-  const sortedMessages = [...filteredMessages].sort((a, b) => {
-    switch (sortOption) {
-      case "dateAsc":
-        return a.date.getTime() - b.date.getTime();
-      case "dateDesc":
-        return b.date.getTime() - a.date.getTime();
-      case "satsAsc":
-        return a.amount - b.amount;
-      case "satsDesc":
-        return b.amount - a.amount;
-      default:
-        return 0;
-    }
-  });
+  const sortedMessages = useMemo(() => {
+    return [...filteredMessages].sort((a, b) => {
+      switch (sortOption) {
+        case "dateAsc":
+          return a.date.getTime() - b.date.getTime();
+        case "dateDesc":
+          return b.date.getTime() - a.date.getTime();
+        case "satsAsc":
+          return a.amount - b.amount;
+        case "satsDesc":
+          return b.amount - a.amount;
+        default:
+          return 0;
+      }
+    });
+  }, [filteredMessages, sortOption]);
 
   const isFiltersApplied =
     filters.search !== "" ||
@@ -160,12 +164,21 @@ export function Sidebar({
     filters.status !== "all" ||
     filters.minSats !== 0;
 
+  const sortedActiveMessages = useMemo(() => {
+    return sortedMessages.filter((msg) => msg.active);
+  }, [sortedMessages]);
+
+  const sortedInactiveMessages = useMemo(() => {
+    return sortedMessages.filter((msg) => !msg.active);
+  }, [sortedMessages]);
+
   return (
     <div
-      className={`fixed top-0 left-0 h-[calc(100vh-56px)] bg-indigo-800 border-r border-indigo-700 flex flex-col py-1 px-2 transition-transform duration-300 z-40 md:-z-1 ${
+      className={`fixed overflow-x-hidden top-0 left-0 h-[calc(100vh-56px)] bg-indigo-800 border-r border-indigo-700 flex flex-col py-1 px-2 transition-transform duration-300 z-40 md:-z-1 ${
         sidebarOpen ? "translate-x-0" : "-translate-x-full"
       } md:relative md:translate-x-0 md:w-80`}
     >
+      {/* Sidebar Header */}
       <div className="flex items-center justify-between">
         <button
           onClick={() => setSidebarOpen(false)}
@@ -175,6 +188,7 @@ export function Sidebar({
         </button>
       </div>
 
+      {/* Filters and Sorting */}
       <div className="space-y-2 p-2 mt-2">
         <div className="flex items-center space-x-2">
           <Input
@@ -295,76 +309,59 @@ export function Sidebar({
         </Select>
       </div>
 
-      <div className="flex-grow overflow-auto p-2 space-y-2">
-        {messages.length === 0 ? (
-          <div className="flex justify-start mt-10 items-center flex-col">
-            <Loader2 className="w-8 h-8 text-white animate-spin mb-2" />
-            <p className="text-white ml-2">Loading...</p>
+      {/* Markers List */}
+      <div className="flex-grow overflow-auto p-2 space-y-4">
+        {/* Active Markers Section */}
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-lg font-semibold text-white">Active</h2>
           </div>
-        ) : (
-          sortedMessages.map((message, index) => {
-            const isActive = message.id === activeMarkerId;
-            const backgroundColorClass = isActive
-              ? "bg-indigo-600"
-              : message.active
-              ? "bg-pink-500"
-              : "bg-indigo-700";
+          {loadingActive ? (
+            <div className="flex justify-start mt-2 items-center flex-col">
+              <Loader2 className="w-6 h-6 text-white animate-spin mb-1" />
+              <p className="text-white text-sm">Loading active markers...</p>
+            </div>
+          ) : sortedActiveMessages.length === 0 ? (
+            <div className="flex justify-start mt-2 items-center flex-col">
+              <p className="text-white text-sm">No active markers found.</p>
+            </div>
+          ) : (
+            sortedActiveMessages.map((message) => (
+              <MessageItem
+                key={message.id}
+                message={message}
+                isSelected={message.id === activeMarkerId}
+                setActiveMarkerId={setActiveMarkerId}
+              />
+            ))
+          )}
+        </div>
 
-            return (
-              <div
-                key={index}
-                onClick={() => setActiveMarkerId(message.id)}
-                className={`relative px-3 py-3 text-white rounded-lg shadow-md w-full min-w-[200px] cursor-pointer transition-colors duration-200 ${backgroundColorClass} ${
-                  !isActive ? "hover:bg-indigo-600" : ""
-                }`}
-              >
-                <div className="flex items-center justify-between mb-1">
-                  <div className="flex items-center">
-                    <Zap className="w-3 h-3 text-yellow-500 mr-1" />
-                    <p className="text-xs text-yellow-500 font-semibold">
-                      {message.amount}
-                    </p>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="relative group">
-                      <LinkIcon
-                        className="w-3 h-3 cursor-pointer"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          const url = `https://zapin.me/?pin=${message.id}`;
-                          navigator.clipboard.writeText(url);
-                          setCopied(true);
-                          setTimeout(() => setCopied(false), 2000);
-                        }}
-                      />
-                      <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-1 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-700 text-white text-xs rounded px-2 py-1">
-                        {copied ? "Copied" : "Link"}
-                      </div>
-                    </div>
-                    {message.nostr_link && (
-                      <div className="relative group">
-                        <a
-                          href={message.nostr_link}
-                          target="_blank"
-                          rel="noreferrer"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <SquareArrowOutUpRight className="w-3 h-3 cursor-pointer" />
-                          <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-1 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-700 text-white text-xs rounded px-2 py-1">
-                            Note
-                          </div>
-                        </a>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <h2 className="text-sm font-medium break-words">
-                  {message.message}
-                </h2>
-              </div>
-            );
-          })
-        )}
+        {/* Inactive Markers Section */}
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-lg font-semibold text-white">Inactive</h2>
+          </div>
+          {loadingInactive ? (
+            <div className="flex justify-start mt-2 items-center flex-col">
+              <Loader2 className="w-6 h-6 text-white animate-spin mb-1" />
+              <p className="text-white text-sm">Loading inactive markers...</p>
+            </div>
+          ) : sortedInactiveMessages.length === 0 ? (
+            <div className="flex justify-start mt-2 items-center flex-col">
+              <p className="text-white text-sm">No inactive markers found.</p>
+            </div>
+          ) : (
+            sortedInactiveMessages.map((message) => (
+              <MessageItem
+                key={message.id}
+                message={message}
+                isSelected={message.id === activeMarkerId}
+                setActiveMarkerId={setActiveMarkerId}
+              />
+            ))
+          )}
+        </div>
       </div>
     </div>
   );
