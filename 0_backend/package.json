@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "@nostr-dev-kit/ndk": "^2.10.0",
-    "axios": "^1.7.4",
+    "axios": "^1.16.1",
     "body-parser": "^1.20.2",
     "cords": "^1.0.4",
     "dotenv": "^16.4.5",
@@ -33,7 +33,7 @@
     "phoenix-server-js": "^1.1.1",
     "socket.io": "^4.7.5",
     "sqlite": "^5.1.1",
-    "sqlite3": "^5.1.7",
+    "sqlite3": "^6.0.1",
     "ws": "^8.18.0"
   }
 }
