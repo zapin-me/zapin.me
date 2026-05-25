@@ -23,6 +23,7 @@ services:
       - ./0_backend/.env
     volumes:
       - ./0_backend:/usr/src/app
+      - backend-node-modules:/usr/src/app/node_modules
       - ./0_backend/data:/usr/src/app/data
     restart: always
     depends_on:
@@ -38,6 +39,7 @@ services:
       - 3006:3000
     volumes:
       - ./1_frontend:/usr/src/app
+      - frontend-node-modules:/usr/src/app/node_modules
     restart: always
     depends_on:
       - backend
@@ -47,3 +49,7 @@ services:
 networks:
   zapin-network:
     driver: bridge
+
+volumes:
+  backend-node-modules:
+  frontend-node-modules:
