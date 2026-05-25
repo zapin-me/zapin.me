@@ -1,4 +1,4 @@
-# zapin.me 
+![image](https://github.com/user-attachments/assets/aae303c5-df2f-46b6-a84e-cfdcd39057a6)
 
 **zapin.me** is an open-source platform where users can pin messages on a global map, powered by the Lightning Network. Each message is paid for with Satoshis, and the visibility of the message on the map is determined by the amount of Satoshis spent. For every Satoshi you donate, your message stays visible on the map for 10 seconds. This project leverages modern web technologies and a decentralized backend to create an interactive and engaging experience.
 
