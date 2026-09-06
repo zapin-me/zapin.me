@@ -54,6 +54,8 @@
   },
   "overrides": {
     "js-cookie": "3.0.7",
-    "postcss": "$postcss"
+    "postcss": "$postcss",
+    "postcss-selector-parser": "6.1.3",
+    "qs": "6.16.0"
   }
 }

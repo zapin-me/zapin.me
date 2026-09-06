@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dependency-regression:
+    name: Dependency security regression
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 20
+      - name: Verify patched dependency versions
+        run: node --test scripts/dependency-security.test.mjs
+
+  verify:
+    name: Verify ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: backend
+            directory: 0_backend
+            lockfile: 0_backend/package-lock.json
+            verify: npm run build
+          - name: frontend
+            directory: 1_frontend
+            lockfile: 1_frontend/package-lock.json
+            verify: npm run lint && npm run build
+    defaults:
+      run:
+        working-directory: ${{ matrix.directory }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: ${{ matrix.lockfile }}
+      - name: Pin npm
+        run: npm install --global npm@10.9.8
+      - name: Install dependencies
+        run: npm ci
+      - name: Audit all dependencies
+        run: npm audit --audit-level=low
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=low
+      - name: Verify registry signatures
+        run: npm audit signatures
+      - name: Run project gates
+        run: ${{ matrix.verify }}
