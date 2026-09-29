@@ -34,6 +34,15 @@ test("frontend resolves qs at the patched minimum", () => {
   assertAtLeast(resolvedVersion("1_frontend", "qs"), "6.16.0", "qs", "1_frontend");
 });
 
+test("backend resolves undici at the patched minimum", () => {
+  assertAtLeast(
+    resolvedVersion("0_backend", "undici"),
+    "6.28.1",
+    "undici",
+    "0_backend",
+  );
+});
+
 test("frontend resolves postcss-selector-parser at the patched minimum", () => {
   assertAtLeast(
     resolvedVersion("1_frontend", "postcss-selector-parser"),
