@@ -7,7 +7,8 @@
     "start:dev": "next dev",
     "build": "next build",
     "start:prod": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "node --test src/Utils/pinForm.test.mjs"
   },
   "dependencies": {
     "@radix-ui/react-icons": "^1.3.0",
@@ -24,7 +25,7 @@
     "leaflet": "^1.9.4",
     "lucide-react": "^0.428.0",
     "motion-number": "^0.1.6",
-    "next": "^15.5.18",
+    "next": "^15.5.28",
     "react": "^18.3.1",
     "react-confetti": "^6.1.0",
     "react-day-picker": "^8.10.1",
@@ -38,7 +39,7 @@
     "tailwindcss-animate": "^1.0.7",
     "webln": "^0.3.2",
     "ws": "^8.21.0",
-    "zod": "^3.23.8"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@types/leaflet": "^1.9.12",
@@ -47,7 +48,7 @@
     "@types/react-dom": "^18",
     "@types/ws": "^8.5.12",
     "eslint": "^8",
-    "eslint-config-next": "^15.5.18",
+    "eslint-config-next": "^15.5.28",
     "postcss": "^8.5.15",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
@@ -55,7 +56,7 @@
   "overrides": {
     "js-cookie": "3.0.7",
     "postcss": "$postcss",
-    "postcss-selector-parser": "6.1.3",
+    "postcss-selector-parser": "6.1.5",
     "qs": "6.16.0"
   }
 }
