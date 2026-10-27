@@ -2,23 +2,12 @@
 import axios from "axios";
 import { Eraser, Send, Smile } from "lucide-react";
 import { useState, useEffect } from "react";
-import { z } from "zod";
+import { validatePinForm } from "@/Utils/pinForm.mjs";
 import { CreatePinMap } from "./MapComponent";
 import EmojiPicker from "emoji-picker-react";
 import { sendEvent } from "@/Utils/analytics";
 
 const NEXT_PUBLIC_BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
-
-const formSchema = z.object({
-  message: z
-    .string()
-    .min(1, "Message is required")
-    .max(500, "Max message length is 500 characters."),
-  amount: z
-    .number()
-    .min(1, "Amount must be at least 1")
-    .max(1000000, "Max amount is 1,000,000."),
-});
 
 const Stage0 = ({
   setShowModal,
@@ -149,16 +138,10 @@ const Stage0 = ({
   };
 
   const handleSubmit = async () => {
-    try {
-      formSchema.parse({ message, amount });
-      setErrors({});
+    const formErrors = validatePinForm({ message, amount });
+    setErrors(formErrors);
+    if (Object.keys(formErrors).length === 0) {
       fetchInvoice();
-    } catch (e: any) {
-      const formattedErrors: Record<string, string> = {};
-      e.errors.forEach((err: any) => {
-        formattedErrors[err.path[0]] = err.message;
-      });
-      setErrors(formattedErrors);
     }
   };
 

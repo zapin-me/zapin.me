@@ -46,8 +46,18 @@ test("backend resolves undici at the patched minimum", () => {
 test("frontend resolves postcss-selector-parser at the patched minimum", () => {
   assertAtLeast(
     resolvedVersion("1_frontend", "postcss-selector-parser"),
-    "6.1.3",
+    "6.1.5",
     "postcss-selector-parser",
     "1_frontend",
   );
+});
+
+test("frontend resolves zod at the patched minimum", () => {
+  // GHSA-mrhx-c7xc-m3w5 (high); no 3.x fix exists
+  assertAtLeast(resolvedVersion("1_frontend", "zod"), "4.6.6", "zod", "1_frontend");
+});
+
+test("frontend resolves next at the patched minimum", () => {
+  // GHSA-2464-fhr4-w9xw (critical RCE) and GHSA-p3m5-59mp-jv5r (high DoS)
+  assertAtLeast(resolvedVersion("1_frontend", "next"), "15.5.28", "next", "1_frontend");
 });

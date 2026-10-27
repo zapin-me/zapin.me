@@ -41,7 +41,7 @@ jobs:
           - name: frontend
             directory: 1_frontend
             lockfile: 1_frontend/package-lock.json
-            verify: npm run lint && npm run build
+            verify: npm test && npm run lint && npm run build
     defaults:
       run:
         working-directory: ${{ matrix.directory }}
