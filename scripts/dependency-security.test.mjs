@@ -26,12 +26,13 @@ function assertAtLeast(actual, minimum, dependency, project) {
   }
 }
 
+// GHSA-6pq8-jhm2-2vcw (medium): qs.stringify arrayFormat "comma" TypeError
 test("backend resolves qs at the patched minimum", () => {
-  assertAtLeast(resolvedVersion("0_backend", "qs"), "6.16.0", "qs", "0_backend");
+  assertAtLeast(resolvedVersion("0_backend", "qs"), "6.16.1", "qs", "0_backend");
 });
 
 test("frontend resolves qs at the patched minimum", () => {
-  assertAtLeast(resolvedVersion("1_frontend", "qs"), "6.16.0", "qs", "1_frontend");
+  assertAtLeast(resolvedVersion("1_frontend", "qs"), "6.16.1", "qs", "1_frontend");
 });
 
 test("backend resolves undici at the patched minimum", () => {
@@ -50,6 +51,23 @@ test("frontend resolves postcss-selector-parser at the patched minimum", () => {
     "postcss-selector-parser",
     "1_frontend",
   );
+});
+
+test("frontend resolves glob at the patched minimum", () => {
+  // GHSA-3g3m-2fjr-6pw4 (medium), production path via tailwindcss -> sucrase
+  assertAtLeast(resolvedVersion("1_frontend", "glob"), "14.0.2", "glob", "1_frontend");
+});
+
+test("frontend production minimatch installs are patched", () => {
+  // GHSA-g3hv-75wg-m249 (medium) has no fix below 11.0.1; dev-only lint
+  // tooling may still carry older copies, production paths may not.
+  const lockfile = JSON.parse(
+    readFileSync(new URL("1_frontend/package-lock.json", root), "utf8"),
+  );
+  for (const [path, entry] of Object.entries(lockfile.packages)) {
+    if (!/(^|\/)node_modules\/minimatch$/.test(path) || entry.dev === true) continue;
+    assertAtLeast(entry.version, "11.0.1", `minimatch (${path})`, "1_frontend");
+  }
 });
 
 test("frontend resolves zod at the patched minimum", () => {

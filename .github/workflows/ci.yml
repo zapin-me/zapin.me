@@ -24,8 +24,8 @@ jobs:
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 20
-      - name: Verify patched dependency versions
-        run: node --test scripts/dependency-security.test.mjs
+      - name: Verify patched dependency versions and audit gate
+        run: node --test scripts/dependency-security.test.mjs scripts/audit-gate.test.mjs
 
   verify:
     name: Verify ${{ matrix.name }}
@@ -58,8 +58,8 @@ jobs:
         run: npm install --global npm@10.9.8
       - name: Install dependencies
         run: npm ci
-      - name: Audit all dependencies
-        run: npm audit --audit-level=low
+      - name: Audit all dependencies (exact dev-only allowlist)
+        run: node ../scripts/audit-gate.mjs
       - name: Audit production dependencies
         run: npm audit --omit=dev --audit-level=low
       - name: Verify registry signatures
