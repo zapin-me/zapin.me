@@ -43,6 +43,11 @@ Follow these steps to get zapin.me up and running on your local machine:
     NEXT_PUBLIC_LIMIT_MESSAGES=100
     ```
 
+    The frontend image is a production build: these `NEXT_PUBLIC_*` values are
+    baked in when the image is built (rebuild the frontend after changing them),
+    and the build refuses any other key, since the file ends up inside the image.
+    Without `1_frontend/.env` the build uses `1_frontend/.env-sample`.
+
 3. **Start the Services:**
     Run the following command to build and start the services:
     ```bash
