@@ -37,9 +37,6 @@ services:
       dockerfile: ./Dockerfile
     ports:
       - 3006:3000
-    volumes:
-      - ./1_frontend:/usr/src/app
-      - frontend-node-modules:/usr/src/app/node_modules
     restart: always
     depends_on:
       - backend
@@ -52,4 +49,3 @@ networks:
 
 volumes:
   backend-node-modules:
-  frontend-node-modules:
