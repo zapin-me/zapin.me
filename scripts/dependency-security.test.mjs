@@ -70,6 +70,27 @@ test("frontend production minimatch installs are patched", () => {
   }
 });
 
+test("every minimatch install, dev included, is outside the GHSA-g3hv-75wg-m249 range", () => {
+  // Vulnerable >= 7.0.0 < 11.0.1; eslint 8's minimatch 3.x is outside it.
+  for (const project of ["0_backend", "1_frontend"]) {
+    const lockfile = JSON.parse(
+      readFileSync(new URL(`${project}/package-lock.json`, root), "utf8"),
+    );
+    for (const [path, entry] of Object.entries(lockfile.packages)) {
+      if (!/(^|\/)node_modules\/minimatch$/.test(path)) continue;
+      if (Number(entry.version.split(".")[0]) < 7) continue;
+      assertAtLeast(entry.version, "11.0.1", `minimatch (${path})`, project);
+    }
+  }
+});
+
+test("the full audit gate allowlist is empty", async () => {
+  // minimatch/glob were allowlisted while dev tooling could not take the
+  // patched majors. Add an entry only with a documented, dev-only reason.
+  const { ALLOWLIST } = await import("./audit-gate.mjs");
+  assert.deepEqual(ALLOWLIST, []);
+});
+
 test("frontend resolves zod at the patched minimum", () => {
   // GHSA-mrhx-c7xc-m3w5 (high); no 3.x fix exists
   assertAtLeast(resolvedVersion("1_frontend", "zod"), "4.6.6", "zod", "1_frontend");
