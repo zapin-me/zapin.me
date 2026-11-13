@@ -50,14 +50,11 @@ export function evaluateFullAudit(audit, lockfile, allowlist) {
   return { ok: errors.length === 0, errors };
 }
 
-// Advisories published 2026-10-30 with no fix outside a new major line. They
-// reach Zapin only through development tooling (eslint 8 and its plugins,
-// nodemon), which cannot take minimatch 11 / glob 14 without a breaking
-// toolchain upgrade. Remove each entry once the tooling is upgraded.
-export const ALLOWLIST = [
-  { url: "https://github.com/advisories/GHSA-g3hv-75wg-m249", name: "minimatch" },
-  { url: "https://github.com/advisories/GHSA-3g3m-2fjr-6pw4", name: "glob" },
-];
+// Advisories may be allowlisted only when they have no fix outside a new major
+// line and reach Zapin through development tooling alone. The minimatch/glob
+// entries (GHSA-g3hv-75wg-m249, GHSA-3g3m-2fjr-6pw4) were removed once every
+// copy resolved to a patched version.
+export const ALLOWLIST = [];
 
 async function main() {
   const { spawnSync } = await import("node:child_process");
