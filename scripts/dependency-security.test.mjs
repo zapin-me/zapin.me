@@ -97,6 +97,8 @@ test("frontend resolves zod at the patched minimum", () => {
 });
 
 test("frontend resolves next at the patched minimum", () => {
-  // GHSA-2464-fhr4-w9xw (critical RCE) and GHSA-p3m5-59mp-jv5r (high DoS)
-  assertAtLeast(resolvedVersion("1_frontend", "next"), "15.5.28", "next", "1_frontend");
+  // GHSA-2464-fhr4-w9xw (critical RCE) and GHSA-p3m5-59mp-jv5r (high DoS);
+  // GHSA-f3mh-rxg3-f5g2 (Edge HttpOnly cookie exposure) and
+  // GHSA-7qx7-33qx-rqx2 (image optimization SVG rejection bypass)
+  assertAtLeast(resolvedVersion("1_frontend", "next"), "15.5.29", "next", "1_frontend");
 });
